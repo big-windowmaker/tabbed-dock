@@ -271,6 +271,15 @@ btd_prefs_icon_name(void)
     return t && gtk_icon_theme_has_icon(t, "big-wm-tabbed-dock") ? "big-wm-tabbed-dock" : "preferences-desktop";
 }
 
+void
+btd_prefs_dialog_sync(GtkWidget *dialog)
+{
+    Prefs *p = dialog ? g_object_get_data(G_OBJECT(dialog), "prefs") : NULL;
+    if (!p)
+        return;
+    widgets_from_prefs(p);
+}
+
 GtkWidget *
 btd_prefs_dialog_new(BtdDock *dock)
 {

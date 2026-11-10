@@ -54,6 +54,12 @@ void btd_prefs_copy(BtdPrefs *dst, const BtdPrefs *src);
 const char *btd_edge_to_string(BtdEdge e);
 const char *btd_align_to_string(BtdAlign a);
 const char *btd_style_to_string(BtdStyle s);
+/* FALSE (and *out untouched) for an unknown value. */
+gboolean btd_edge_from_string(const char *s, BtdEdge *edge);
+gboolean btd_align_from_string(const char *s, BtdAlign *align);
+/* Alignment after delta steps of the dock-app's arrows (fill → right →
+ * center → left → fill for +1). */
+BtdAlign btd_align_step(BtdAlign align, int delta);
 
 /* ~/.config/big-tabbed-dock/dock.conf (honours XDG_CONFIG_HOME). */
 char *btd_config_default_path(void);

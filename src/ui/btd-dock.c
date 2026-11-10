@@ -3,6 +3,7 @@
  * Big Tabbed Dock — the dock window: layout, drawing, input, positioning.
  */
 #include "btd-dock.h"
+#include "btd-control.h"
 
 #include <glib/gi18n.h>
 #include <math.h>
@@ -798,6 +799,29 @@ btd_dock_relayout(BtdDock *dock)
         gdk_monitor_get_geometry(dock->monitor, &geo);
         if (dock->prefs.align == BTD_ALIGN_FILL || width > geo.width)
             width = geo.width;
+        dock->wm_left = dock->wm_right = 0;
+#ifdef BTD_HAVE_X11
+        /* X11: not over Window Maker's Dock and Clip (their columns of
+         * tiles on the sides of the shelf's band), which would be out of
+         * reach under it (with the Tabbed Dock's controller in the Dock);
+         * every alignment fits between them. On Wayland the compositor
+         * leaves them out. */
+        if (!dock->layer_shell) {
+            int band_h = MAX(dock->max_h, dock->height);
+            GdkRectangle band = { geo.x,
+                                  dock->prefs.edge == BTD_EDGE_TOP ? geo.y : geo.y + geo.height - band_h,
+                                  geo.width, band_h };
+            int left = 0, right = 0;
+            btd_x11_wm_dock_margins(gtk_widget_get_display(dock->window), &band, &left, &right);
+            if (left + right < geo.width / 2) {
+                dock->wm_left = left;
+                dock->wm_right = right;
+                int usable = geo.width - left - right;
+                if (dock->prefs.align == BTD_ALIGN_FILL || width > usable)
+                    width = usable;
+            }
+        }
+#endif
     }
     /* On Wayland a surface anchored to both sides gets its width from the
      * compositor (the usable area, e.g. minus the Clip): draw to that. */
@@ -972,13 +996,15 @@ position_window(BtdDock *dock)
         return;
     GdkRectangle geo;
     gdk_monitor_get_geometry(dock->monitor, &geo);
-    int x = geo.x, y;
+    /* between Window Maker's Clip and Dock (X11; 0 otherwise) */
+    int ux = geo.x + dock->wm_left, uw = geo.width - dock->wm_left - dock->wm_right;
+    int x = ux, y;
     switch (dock->prefs.align) {
     case BTD_ALIGN_CENTER:
-        x = geo.x + (geo.width - dock->width) / 2;
+        x = ux + (uw - dock->width) / 2;
         break;
     case BTD_ALIGN_RIGHT:
-        x = geo.x + geo.width - dock->width;
+        x = ux + uw - dock->width;
         break;
     default:
         break;
@@ -1059,6 +1085,27 @@ on_screen_changed(GdkScreen *screen, gpointer data)
 
 /* ---- autohide ------------------------------------------------------------- */
 
+#ifdef BTD_HAVE_X11
+static BtdDock *wm_dock_owner;
+
+static gboolean
+wm_dock_relayout(gpointer data)
+{
+    BtdDock *dock = data;
+    dock->wm_dock_id = 0;
+    btd_dock_relayout(dock);
+    return G_SOURCE_REMOVE;
+}
+
+static void
+on_wm_dock_changed(gpointer data)
+{
+    BtdDock *dock = data;
+    if (!dock->wm_dock_id)
+        dock->wm_dock_id = g_timeout_add(200, wm_dock_relayout, dock);
+}
+#endif
+
 void
 btd_dock_set_hidden(BtdDock *dock, gboolean hidden)
 {
@@ -1074,6 +1121,17 @@ btd_dock_set_hidden(BtdDock *dock, gboolean hidden)
         return;
     dock->hidden = hidden;
     btd_dock_relayout(dock);
+    btd_control_sync(); /* the "visible" state of the control API */
+}
+
+/* Folds the shelf to the strip (as the arrow button does) or unfolds it,
+ * whatever the auto-hide preference: the dock-app's Show/Hide. */
+void
+btd_dock_set_folded(BtdDock *dock, gboolean folded)
+{
+    dock->collapsing = folded;
+    btd_dock_set_hidden(dock, folded);
+    dock->collapsing = FALSE;
 }
 
 static gboolean
@@ -1787,6 +1845,7 @@ btd_dock_apply_prefs(BtdDock *dock)
     btd_dock_relayout(dock);
     btd_icon_cache_clear(dock->icons);
     schedule_hide(dock);
+    btd_control_sync(); /* states of the control API (dock-app, scripts) */
 }
 
 /* Big WindowMaker light/dark mode: big-wm-theme writes "light" or "dark"
@@ -2139,6 +2198,12 @@ dock_new(GtkApplication *app, const char *config_path, int monitor, gboolean loc
     btd_dock_dnd_init(dock);
 
     dock->tracker = btd_window_tracker_new(display);
+#ifdef BTD_HAVE_X11
+    if (GDK_IS_X11_DISPLAY(display) && !dock->secondary && !wm_dock_owner) {
+        wm_dock_owner = dock;
+        btd_x11_set_wm_dock_func(on_wm_dock_changed, dock);
+    }
+#endif
 #ifdef BTD_HAVE_WAYLAND
     if (dock->wayland) {
         btd_wayland_set_names_changed((void (*)(gpointer))btd_dock_relayout, dock);
@@ -2180,6 +2245,14 @@ btd_dock_free(BtdDock *dock)
 {
     if (!dock)
         return;
+#ifdef BTD_HAVE_X11
+    if (dock == wm_dock_owner) {
+        btd_x11_set_wm_dock_func(NULL, NULL);
+        wm_dock_owner = NULL;
+    }
+#endif
+    if (dock->wm_dock_id)
+        g_source_remove(dock->wm_dock_id);
     if (dock->save_id)
         btd_dock_save_now(dock);
     if (dock->hide_id)

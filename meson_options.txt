@@ -2,3 +2,4 @@ option('dock', type: 'boolean', value: true, description: 'Build the dock (GTK 3
 option('tests', type: 'boolean', value: true, description: 'Build the unit tests')
 option('x11', type: 'feature', value: 'auto', description: 'X11 window tracking (EWMH)')
 option('wayland', type: 'feature', value: 'auto', description: 'Wayland support (gtk-layer-shell, foreign toplevels)')
+option('dockapp', type: 'boolean', value: true, description: 'Build the dock-app controller (X11 dock-app for the Window Maker Dock and, through XWayland, wlmaker)')

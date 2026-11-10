@@ -11,6 +11,7 @@ add_project_arguments(
   '-DGETTEXT_PACKAGE="big-wm-tabbed-dock"',
   '-DLOCALEDIR="@0@"'.format(get_option('prefix') / get_option('localedir')),
   '-DBTD_VERSION="@0@"'.format(meson.project_version()),
+  '-DBTD_DATADIR="@0@"'.format(get_option('prefix') / get_option('datadir')),
   '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_74',
   cc.get_supported_arguments('-Wno-unused-parameter', '-Wno-missing-field-initializers',
                              '-Wshadow', '-Wformat=2', '-Werror=implicit-function-declaration'),

@@ -102,6 +102,8 @@ struct _BtdDock {
     /* X11: the window always spans the monitor (win_w x win_h); the drawing
      * area (dock->width) sits inside it at offset_x. */
     int win_w, win_h, offset_x, offset_y;
+    int wm_left, wm_right; /* X11: Window Maker's Clip/Dock columns beside the shelf */
+    guint wm_dock_id;     /* relayout after Window Maker's tiles changed */
     int max_h;            /* tallest the dock can be (96 px icons, labels) */
     int repaint_step;
 
@@ -158,6 +160,7 @@ void btd_dock_error(BtdDock *dock, const char *primary, const char *secondary);
 gboolean btd_dock_ask(BtdDock *dock, const char *primary, const char *secondary, const char *ok_label);
 char *btd_dock_ask_text(BtdDock *dock, const char *title, const char *label, const char *initial);
 void btd_dock_set_hidden(BtdDock *dock, gboolean hidden);
+void btd_dock_set_folded(BtdDock *dock, gboolean folded);
 
 Slot *btd_dock_slot(BtdDock *dock, int index);
 
@@ -176,6 +179,8 @@ void btd_dock_idrag_end(BtdDock *dock, double x, double y, gboolean copy, gboole
 
 /* btd-prefs.c */
 GtkWidget *btd_prefs_dialog_new(BtdDock *dock);
+/* Shows the dock's preferences again (changed from outside the window). */
+void btd_prefs_dialog_sync(GtkWidget *dialog);
 const char *btd_prefs_icon_name(void); /* big-wm-tabbed-dock, or a generic one when missing */
 
 G_END_DECLS

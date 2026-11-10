@@ -100,6 +100,12 @@ BtdWindowTracker *btd_x11_tracker_new(GdkDisplay *display);
  * Returns the number of grabs that succeeded (others belong to someone else). */
 int btd_x11_grab_shortcuts(GdkDisplay *display, BtdShortcutFunc func, gpointer data);
 void btd_x11_ungrab_shortcuts(GdkDisplay *display);
+/* Width taken by Window Maker's Dock and Clip (their columns of tiles) at
+ * the left and right of band (root coordinates), for the full-width shelf. */
+void btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *band, int *left, int *right);
+typedef void (*BtdWmDockFunc)(gpointer data);
+/* Called when one of those tiles maps, moves or goes. */
+void btd_x11_set_wm_dock_func(BtdWmDockFunc func, gpointer data);
 #endif
 #ifdef BTD_HAVE_WAYLAND
 BtdWindowTracker *btd_wayland_tracker_new(GdkDisplay *display);

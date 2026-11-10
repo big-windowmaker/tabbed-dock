@@ -1,0 +1,27 @@
+// Right-click menu of the Tabbed Dock controller on wlmaker (installed in
+// /usr/share/wlmaker/Dockapps.d/; the dock-app's entry, as in wlmaker's
+// Dockapps.plist). The controller keeps the values in line with the dock
+// (~/.config/wlmaker/big-wm-tabbed-dock-dockapp.plist) and applies what is
+// picked here; the monitors come from the file next to it, which it keeps
+// up to date (hotplug). Titles are translated with the dock's catalog.
+{
+  TextDomain = "big-wm-tabbed-dock";
+  Actions = (
+    { Title = "Show or Hide the Tabbed Dock"; Command = "big-wm-tabbed-dock-dockapp --toggle"; },
+    { Title = "Tabbed Dock Preferences..."; Command = "big-wm-tabbed-dock-dockapp --preferences"; },
+    { Title = "Restart the Tabbed Dock"; Command = "big-wm-tabbed-dock-dockapp --restart"; },
+    { Title = "Stop the Tabbed Dock"; Command = "big-wm-tabbed-dock-dockapp --stop"; }
+  );
+  Preferences = (
+    { Key = Alignment; Title = "Alignment"; Default = fill;
+      Choices = ((fill, "Full Width"), (right, "Right"), (center, "Center"), (left, "Left")); },
+    { Key = Edge; Title = "Edge"; Default = bottom;
+      Choices = ((bottom, "Bottom"), (top, "Top")); },
+    { Key = Monitor; Title = "Monitor"; Default = primary;
+      ChoicesFile = "big-wm-tabbed-dock-dockapp.monitors.plist"; },
+    { Key = AutoHide; Title = "Hide automatically"; Type = Bool; Default = No; },
+    { Key = ReserveSpace; Title = "Reserve screen space"; Type = Bool; Default = Yes; },
+    { Key = Style; Title = "Appearance"; Default = classic;
+      Choices = ((classic, "Classic (OPENSTEP)"), (tiles, "Window Maker tiles"), (modern, "Modern")); }
+  );
+}

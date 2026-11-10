@@ -29,6 +29,41 @@ parse_enum(const char *value, const char **names, guint n, int fallback)
     return fallback;
 }
 
+gboolean
+btd_edge_from_string(const char *s, BtdEdge *edge)
+{
+    int v = parse_enum(s, edge_names, G_N_ELEMENTS(edge_names), -1);
+    if (v < 0)
+        return FALSE;
+    *edge = (BtdEdge)v;
+    return TRUE;
+}
+
+gboolean
+btd_align_from_string(const char *s, BtdAlign *align)
+{
+    int v = parse_enum(s, align_names, G_N_ELEMENTS(align_names), -1);
+    if (v < 0)
+        return FALSE;
+    *align = (BtdAlign)v;
+    return TRUE;
+}
+
+/* The order of the dock-app's horizontal arrows: ▶ goes fill → right →
+ * center → left → fill, ◀ the other way round. */
+BtdAlign
+btd_align_step(BtdAlign align, int delta)
+{
+    static const BtdAlign order[] = { BTD_ALIGN_FILL, BTD_ALIGN_RIGHT, BTD_ALIGN_CENTER, BTD_ALIGN_LEFT };
+    const int n = (int)G_N_ELEMENTS(order);
+    int i = 0;
+    while (i < n && order[i] != align)
+        i++;
+    if (i == n)
+        i = 0;
+    return order[(((i + delta) % n) + n) % n];
+}
+
 void
 btd_prefs_init_defaults(BtdPrefs *p)
 {

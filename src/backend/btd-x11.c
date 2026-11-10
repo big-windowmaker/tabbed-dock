@@ -368,6 +368,8 @@ handle_shortcut(X11Tracker *x, XKeyEvent *ev)
         x->shortcut_func(-2, x->shortcut_data);
 }
 
+static void wm_dock_event(XEvent *ev);
+
 static GdkFilterReturn
 event_filter(GdkXEvent *gxev, GdkEvent *event, gpointer data)
 {
@@ -377,6 +379,9 @@ event_filter(GdkXEvent *gxev, GdkEvent *event, gpointer data)
         handle_shortcut(x, &ev->xkey);
         return GDK_FILTER_REMOVE;
     }
+    if (ev->type == MapNotify || ev->type == UnmapNotify ||
+        (ev->type == ConfigureNotify && ev->xconfigure.event == x->root))
+        wm_dock_event(ev);
     if (ev->type == ConfigureNotify) {
         guint64 cid = (guint64)ev->xconfigure.window;
         BtdWindow *cbw = g_hash_table_lookup(x->base.windows, &cid);
@@ -496,6 +501,88 @@ x11_destroy(BtdWindowTracker *t)
     g_hash_table_unref(x->ignored);
     if (the_tracker == x)
         the_tracker = NULL;
+}
+
+/* ---- Window Maker's Dock and Clip -------------------------------------- */
+
+static BtdWmDockFunc wm_dock_func;
+static gpointer wm_dock_data;
+
+static gboolean
+is_wm_tile(XWindowAttributes *a)
+{
+    /* Window Maker's icons: square, override-redirect, the icon size */
+    return a->override_redirect && a->map_state == IsViewable && a->width == a->height && a->width >= 32 &&
+           a->width <= 160;
+}
+
+void
+btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *band, int *left, int *right)
+{
+    *left = *right = 0;
+    if (!GDK_IS_X11_DISPLAY(display))
+        return;
+    Display *dpy = GDK_DISPLAY_XDISPLAY(display);
+    Window root_ret, parent, *kids = NULL;
+    unsigned n = 0;
+    gdk_x11_display_error_trap_push(display);
+    if (XQueryTree(dpy, DefaultRootWindow(dpy), &root_ret, &parent, &kids, &n)) {
+        for (unsigned i = 0; i < n; i++) {
+            XWindowAttributes a;
+            if (!XGetWindowAttributes(dpy, kids[i], &a) || !is_wm_tile(&a))
+                continue;
+            if (a.y + a.height <= band->y || a.y >= band->y + band->height)
+                continue; /* not in the shelf's band */
+            if (a.x + a.width <= band->x || a.x >= band->x + band->width)
+                continue;
+            if (a.x <= band->x + 2)
+                *left = MAX(*left, a.x + a.width - band->x);
+            else if (a.x + a.width >= band->x + band->width - 2)
+                *right = MAX(*right, band->x + band->width - a.x);
+        }
+        if (kids)
+            XFree(kids);
+    }
+    gdk_x11_display_error_trap_pop_ignored(display);
+}
+
+void
+btd_x11_set_wm_dock_func(BtdWmDockFunc func, gpointer data)
+{
+    wm_dock_func = func;
+    wm_dock_data = data;
+    GdkWindow *root = gdk_get_default_root_window();
+    gdk_window_set_events(root, gdk_window_get_events(root) | GDK_SUBSTRUCTURE_MASK);
+}
+
+/* A tile of Window Maker mapped, moved or gone (the Dock grows, a dock-app
+ * comes): the full-width shelf leaves the Dock's column free. */
+static void
+wm_dock_event(XEvent *ev)
+{
+    if (!wm_dock_func)
+        return;
+    int w = 0, h = 0;
+    gboolean override = FALSE;
+    switch (ev->type) {
+    case MapNotify:
+        override = ev->xmap.override_redirect;
+        w = h = 64;
+        break;
+    case UnmapNotify:
+        override = TRUE; /* not known any more: ask again */
+        w = h = 64;
+        break;
+    case ConfigureNotify:
+        override = ev->xconfigure.override_redirect;
+        w = ev->xconfigure.width;
+        h = ev->xconfigure.height;
+        break;
+    default:
+        return;
+    }
+    if (override && w == h && w >= 32 && w <= 160)
+        wm_dock_func(wm_dock_data);
 }
 
 BtdWindowTracker *

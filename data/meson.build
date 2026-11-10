@@ -22,13 +22,21 @@ i18n_data.merge_file(
 meson.add_install_script('install-dropin.sh', meson.current_source_dir() / 'big-wm.conf',
   get_option('prefix') / 'lib')
 
-# Ícone do dock e das preferências: o tabbed-dock.svg dos ícones do Big
-# WindowMaker (themes/icons/svg, big-wm-themes) no hicolor, achado com
-# qualquer tema de ícones. Compilado fora da árvore do big-wm, fica sem ele
-# (as preferências usam um ícone genérico).
-tabbed_icon = meson.project_source_root() / '..' / 'themes' / 'icons' / 'svg' / 'tabbed-dock.svg'
-fs = import('fs')
-if fs.is_file(tabbed_icon)
-  install_data(tabbed_icon, rename: 'big-wm-tabbed-dock.svg',
-    install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps')
+# Ícone do dock, das preferências e do dockapp controlador (tabbed-dock.svg,
+# no estilo dos ícones do Window Maker) no hicolor, achado com qualquer tema
+# de ícones.
+install_data('icons/tabbed-dock.svg', rename: 'big-wm-tabbed-dock.svg',
+  install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps')
+
+if get_option('dockapp')
+  i18n_data.merge_file(
+    input: 'big-wm-tabbed-dock-dockapp.desktop.in',
+    output: 'big-wm-tabbed-dock-dockapp.desktop',
+    type: 'desktop',
+    po_dir: meson.project_source_root() / 'po',
+    install: true,
+    install_dir: get_option('datadir') / 'applications')
+  # Menu do botão direito do ladrilho no wlmaker (Dockapps.d)
+  install_data('wlmaker/big-wm-tabbed-dock-dockapp.plist',
+    install_dir: get_option('datadir') / 'wlmaker' / 'Dockapps.d')
 endif

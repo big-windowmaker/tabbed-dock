@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include "btd-coexist.h"
+#include "btd-control.h"
 #include "btd-dock.h"
 
 #define APP_ID "io.github.big_windowmaker.TabbedDock"
@@ -186,6 +187,7 @@ print_dock_state(GApplicationCommandLine *cl, BtdDock *d)
                            btd_align_to_string(d->prefs.align), btd_style_to_string(d->prefs.style),
                            d->prefs.icon_size);
     g_string_append_printf(s, "theme=%s\n", d->dark_mode ? "dark" : "light");
+    g_string_append_printf(s, "x11_area offset=%d wm_left=%d wm_right=%d\n", d->offset_x, d->wm_left, d->wm_right);
     g_string_append_printf(s, "docks=%u forced_monitor=%d local_only=%d\n", 1 + (extra_docks ? extra_docks->len : 0),
                            d->forced_monitor, d->local_only);
     int ww = 0, wh = 0;
@@ -270,6 +272,7 @@ on_command_line(GApplication *app, GApplicationCommandLine *cl, gpointer data)
         the_dock = btd_dock_new(GTK_APPLICATION(app), opt_config);
         the_dock->saved = on_dock_saved;
         btd_dock_show(the_dock);
+        btd_control_attach(the_dock);
         GdkDisplay *display = gdk_display_get_default();
         g_signal_connect(display, "monitor-added", G_CALLBACK(on_monitors_changed), NULL);
         g_signal_connect(display, "monitor-removed", G_CALLBACK(on_monitors_changed), NULL);
@@ -352,6 +355,7 @@ on_shutdown(GApplication *app, gpointer data)
     for (guint i = 0; extra_docks && i < extra_docks->len; i++)
         btd_dock_free(extra_docks->pdata[i]);
     g_clear_pointer(&extra_docks, g_ptr_array_unref);
+    btd_control_attach(NULL);
     btd_dock_free(the_dock);
     the_dock = NULL;
 }
@@ -394,6 +398,8 @@ main(int argc, char **argv)
         { NULL },
     };
     g_application_add_main_option_entries(G_APPLICATION(app), entries);
+    /* D-Bus control API (alignment, edge, monitor...: btd-control.h) */
+    btd_control_install(app);
     g_application_set_option_context_summary(G_APPLICATION(app),
                                              _("Horizontal tabbed application dock for Window Maker and wlmaker."));
     g_signal_connect(app, "handle-local-options", G_CALLBACK(on_local_options), NULL);

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Tabbed Dock Controller
+GenericName=Dock-app
+Comment=Alignment, edge, monitor and startup of the Tabbed Dock, from the Dock
+Exec=big-wm-tabbed-dock-dockapp
+TryExec=big-wm-tabbed-dock-dockapp
+Icon=big-wm-tabbed-dock
+Categories=DockApp;Settings;
+NoDisplay=true
