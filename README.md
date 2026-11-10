@@ -47,7 +47,7 @@ big-wm-tabbed-dock-dockapp --toggle | --start | --stop | --restart | --preferenc
 ```sh
 meson setup build
 meson compile -C build
-meson test -C build        # 10 conjuntos; o de controle precisa de Xvfb e dbus-daemon
+meson test -C build        # 12 conjuntos; o de controle precisa de Xvfb e dbus-daemon
 sudo meson install -C build
 ```
 
@@ -65,7 +65,7 @@ Preferências e o controlador. Ver [docs/uso-e-configuracao.md](docs/uso-e-confi
 ## Documentação
 
 [docs/](docs/) — arquitetura, uso, X11 e Wayland, testes, e as etapas do controlador
-(`01-auditoria.md` a `15-performance.md`, `RELATORIO-FINAL.md`).
+(`01-auditoria.md` a `16-largura-total-appicons.md`, `RELATORIO-FINAL.md`).
 
 ## História
 
