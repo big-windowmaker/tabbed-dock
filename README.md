@@ -47,7 +47,7 @@ big-wm-tabbed-dock-dockapp --toggle | --start | --stop | --restart | --preferenc
 ```sh
 meson setup build
 meson compile -C build
-meson test -C build        # 9 conjuntos; o de controle precisa de Xvfb e dbus-daemon
+meson test -C build        # 10 conjuntos; o de controle precisa de Xvfb e dbus-daemon
 sudo meson install -C build
 ```
 
