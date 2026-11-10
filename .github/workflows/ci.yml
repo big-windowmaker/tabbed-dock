@@ -36,6 +36,10 @@ jobs:
       - name: Empacotar
         run: |
           su builder -c "cd pkgbuild && TABBED_DOCK_SOURCE='git+file://$GITHUB_WORKSPACE#commit=$GITHUB_SHA' makepkg --nodeps --noconfirm"
+          # A época (1:) põe ":" no nome, que o upload-artifact recusa: troca
+          # por "_" (como no big-windowmaker/packages; o pacman lê a versão do
+          # .PKGINFO, não do nome).
+          for f in pkgbuild/*:*.pkg.tar.zst; do [ -e "$f" ] && mv -- "$f" "${f//:/_}"; done
           ls -l pkgbuild/*.pkg.tar.zst
 
       - name: namcap
@@ -52,4 +56,5 @@ jobs:
         with:
           name: tabbed-dock-packages
           path: pkgbuild/*.pkg.tar.zst
+          if-no-files-found: error
           retention-days: 30
