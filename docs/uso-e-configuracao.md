@@ -180,7 +180,7 @@ cada monitor.
 
 | Espelhado | Independente (a janela A foi para o monitor do meio) | Largura total |
 |---|---|---|
-| ![](../screenshots/tabbed-dock/x11-3-monitores-espelhado.png) | ![](../screenshots/tabbed-dock/x11-3-monitores-independente-movida.png) | ![](../screenshots/tabbed-dock/x11-3-monitores-largura-total.png) |
+| ![](screenshots/x11-3-monitores-espelhado.png) | ![](screenshots/x11-3-monitores-independente-movida.png) | ![](screenshots/x11-3-monitores-largura-total.png) |
 
 Teste: Xvfb 3100×600 com três monitores RandR 1.5 (`xrandr --setmonitor`,
 1000, 1100 e 1000 px), Window Maker e `--print-state` (uma seção `== dock N`

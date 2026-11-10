@@ -6,7 +6,7 @@ Maker (X11) e wlmaker (Wayland). Recria, com interpretação moderna, a
 OPENSTEP 4.0 (fim de 1995) e abandonou antes do 4.0 final.
 
 <p align="center">
-  <img src="../screenshots/tabbed-dock/x11-real-02-running.png" alt="Captura real: sessão X11 com o dock com abas na borda inferior" width="100%">
+  <img src="screenshots/x11-real-02-running.png" alt="Captura real: sessão X11 com o dock com abas na borda inferior" width="100%">
 </p>
 
 > **Capturas reais**, feitas pelos testes automatizados: X11 = Xvfb + Window
@@ -59,14 +59,14 @@ idioma pt_BR, papel de parede e temas do Big WindowMaker.
 
 | | |
 |---|---|
-| ![X11: aba Geral](../screenshots/tabbed-dock/x11-real-01-general.png) X11, aba Geral (Dock clássico à direita) | ![Wayland: aplicativos em execução](../screenshots/tabbed-dock/wl-real-02-running.png) Wayland, indicadores de execução |
-| ![Wayland: os dois docks](../screenshots/tabbed-dock/wl-real-04-both-docks.png) Wayland: dock com abas + `wlmdock` | ![X11: menu de contexto](../screenshots/tabbed-dock/x11-real-04-menu.png) X11: menu de um aplicativo com duas janelas |
-| ![X11: arquivo solto de fora](../screenshots/tabbed-dock/x11-11-external-drop.png) X11: arquivo e pasta soltos (XDND) na aba Temporário | ![X11: estilo moderno no topo](../screenshots/tabbed-dock/x11-13-top-right-modern.png) Estilo Moderno, borda superior, à direita |
-| ![X11: auto-ocultar, largura total](../screenshots/tabbed-dock/x11-15-autohide-shown-fill.png) Largura total com auto-ocultar | ![Wayland: menu de janelas](../screenshots/tabbed-dock/wl-03b-window-menu-fallback.png) Wayland sem wlr-foreign-toplevel: menu em vez de duplicar a janela |
-| ![X11: preferências](../screenshots/tabbed-dock/x11-16-preferences.png) Preferências (X11) | ![Wayland: preferências](../screenshots/tabbed-dock/wl-11-preferences.png) Preferências (Wayland) |
-| ![Wayland: segunda saída](../screenshots/tabbed-dock/wl-multi-output2.png) Wayland: dock na 2ª saída (`Monitor=HEADLESS-2`) | ![X11: HiDPI](../screenshots/tabbed-dock/x11-17-hidpi-scale2.png) X11 com `GDK_SCALE=2` |
-| ![X11: só o dock com abas](../screenshots/tabbed-dock/x11-18-mode-tabbed-only.png) `--dock-mode=tabbed`: Window Maker sem o Dock clássico | ![wlmaker com as propostas](../screenshots/tabbed-dock/wlr-02-two-windows.png) wlmaker + propostas 0042–0044: duas janelas, alternância |
-| ![wlmaker f11a08a: maximizada sob o dock](../screenshots/tabbed-dock/wl-07-maximized.png) Regressão do wlmaker `f11a08a`: janela maximizada passa por baixo do dock (proposta 0044 corrige) | ![X11: depois de arrastar](../screenshots/tabbed-dock/x11-07-after-dnd.png) X11 depois de arrastar um item para outra aba |
+| ![X11: aba Geral](screenshots/x11-real-01-general.png) X11, aba Geral (Dock clássico à direita) | ![Wayland: aplicativos em execução](screenshots/wl-real-02-running.png) Wayland, indicadores de execução |
+| ![Wayland: os dois docks](screenshots/wl-real-04-both-docks.png) Wayland: dock com abas + `wlmdock` | ![X11: menu de contexto](screenshots/x11-real-04-menu.png) X11: menu de um aplicativo com duas janelas |
+| ![X11: arquivo solto de fora](screenshots/x11-11-external-drop.png) X11: arquivo e pasta soltos (XDND) na aba Temporário | ![X11: estilo moderno no topo](screenshots/x11-13-top-right-modern.png) Estilo Moderno, borda superior, à direita |
+| ![X11: auto-ocultar, largura total](screenshots/x11-15-autohide-shown-fill.png) Largura total com auto-ocultar | ![Wayland: menu de janelas](screenshots/wl-03b-window-menu-fallback.png) Wayland sem wlr-foreign-toplevel: menu em vez de duplicar a janela |
+| ![X11: preferências](screenshots/x11-16-preferences.png) Preferências (X11) | ![Wayland: preferências](screenshots/wl-11-preferences.png) Preferências (Wayland) |
+| ![Wayland: segunda saída](screenshots/wl-multi-output2.png) Wayland: dock na 2ª saída (`Monitor=HEADLESS-2`) | ![X11: HiDPI](screenshots/x11-17-hidpi-scale2.png) X11 com `GDK_SCALE=2` |
+| ![X11: só o dock com abas](screenshots/x11-18-mode-tabbed-only.png) `--dock-mode=tabbed`: Window Maker sem o Dock clássico | ![wlmaker com as propostas](screenshots/wlr-02-two-windows.png) wlmaker + propostas 0042–0044: duas janelas, alternância |
+| ![wlmaker f11a08a: maximizada sob o dock](screenshots/wl-07-maximized.png) Regressão do wlmaker `f11a08a`: janela maximizada passa por baixo do dock (proposta 0044 corrige) | ![X11: depois de arrastar](screenshots/x11-07-after-dnd.png) X11 depois de arrastar um item para outra aba |
 
 ## Documentação
 
