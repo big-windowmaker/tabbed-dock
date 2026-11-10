@@ -16,6 +16,19 @@ foreach t : ['model', 'config', 'desktop', 'coexist', 'launch', 'wmattrs']
   test(t, exe, env: test_env, protocol: 'tap', args: ['--tap'])
 endforeach
 
+# O controlador (dockapp), sem X11: ordem das setas, regiões, preferências,
+# --set e os arquivos do menu do wlmaker.
+if get_option('dock') and get_option('dockapp') and have_dockapp
+  exe = executable('test-dockapp', 'test-dockapp.c', dependencies: core_dep, link_with: dockapp_state_lib,
+                   include_directories: include_directories('../src/dockapp'))
+  test('dockapp', exe, env: test_env, protocol: 'tap', args: ['--tap'])
+  # API de controle por D-Bus e --set do controlador (Xvfb e barramento
+  # próprios; pulado sem eles)
+  test('control', find_program('test-control.sh'),
+       args: [dock_exe, meson.project_build_root() / 'src' / 'big-wm-tabbed-dock-dockapp'],
+       protocol: 'tap', timeout: 60, is_parallel: false)
+endif
+
 # Precisa do binário do dock (opção dock); ver o comentário do script.
 if get_option('dock')
   test('sigterm-startup', find_program('test-sigterm-startup.sh'), args: [dock_exe],

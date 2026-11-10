@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: big-wm-tabbed-dock\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 06:05-0300\n"
+"POT-Creation-Date: 2026-11-09 23:54-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,126 +34,142 @@ msgstr ""
 msgid "Temporary"
 msgstr ""
 
-#: src/ui/btd-app.c:332
+#: src/ui/btd-app.c:335
 #, c-format
 msgid "Dock mode set to “%s”; it takes effect at the next login.\n"
 msgstr ""
 
-#: src/ui/btd-app.c:368 src/ui/btd-dock.c:579 src/ui/btd-dock.c:594
-#: src/ui/btd-prefs.c:302
+#: src/ui/btd-app.c:372 src/ui/btd-dock.c:580 src/ui/btd-dock.c:595
+#: src/ui/btd-prefs.c:311 src/dockapp/btd-dockapp.c:823
+#: src/dockapp/btd-dockapp.c:846 src/dockapp/btd-dockapp.c:1155
 msgid "Tabbed Dock"
 msgstr ""
 
-#: src/ui/btd-app.c:384
+#: src/ui/btd-app.c:388
 msgid "Select a tab: next, prev, a number (1…) or a tab id"
 msgstr ""
 
-#: src/ui/btd-app.c:385
+#: src/ui/btd-app.c:389
 msgid "Open the preferences window"
 msgstr ""
 
-#: src/ui/btd-app.c:386
+#: src/ui/btd-app.c:390
 msgid "Reload the configuration file"
 msgstr ""
 
-#: src/ui/btd-app.c:387
+#: src/ui/btd-app.c:391
 msgid "Quit the running dock"
 msgstr ""
 
-#: src/ui/btd-app.c:389
+#: src/ui/btd-app.c:393
 msgid "Choose the docks of the session: classic, tabbed, both, none or status"
 msgstr ""
 
-#: src/ui/btd-app.c:390
+#: src/ui/btd-app.c:394
 msgid "Use another configuration file"
 msgstr ""
 
-#: src/ui/btd-app.c:391
+#: src/ui/btd-app.c:395
 msgid "Print the dock state (for tests)"
 msgstr ""
 
-#: src/ui/btd-app.c:393
+#: src/ui/btd-app.c:397
 msgid "Print the version"
 msgstr ""
 
-#: src/ui/btd-app.c:398
+#: src/ui/btd-app.c:404
 msgid "Horizontal tabbed application dock for Window Maker and wlmaker."
 msgstr ""
 
-#: src/ui/btd-dock.c:89
+#: src/ui/btd-control.c:47 src/ui/btd-prefs.c:53
+#: src/dockapp/btd-dockapp-state.c:241 src/dockapp/btd-dockapp-state.c:273
+msgid "Primary monitor"
+msgstr ""
+
+#: src/ui/btd-control.c:50 src/ui/btd-prefs.c:54
+#: src/dockapp/btd-dockapp-state.c:243 src/dockapp/btd-dockapp-state.c:274
+msgid "All monitors, mirrored"
+msgstr ""
+
+#: src/ui/btd-control.c:53 src/ui/btd-prefs.c:55
+#: src/dockapp/btd-dockapp-state.c:245 src/dockapp/btd-dockapp-state.c:275
+msgid "All monitors, each with its own windows"
+msgstr ""
+
+#: src/ui/btd-dock.c:90
 msgid "Home"
 msgstr ""
 
-#: src/ui/btd-dock.c:101
+#: src/ui/btd-dock.c:102
 msgid "Separator"
 msgstr ""
 
-#: src/ui/btd-dock.c:391
+#: src/ui/btd-dock.c:392
 #, c-format
 msgid "Could not open “%s”"
 msgstr ""
 
-#: src/ui/btd-dock.c:592 src/ui/btd-dock.c:606 src/ui/btd-dock-menu.c:191
+#: src/ui/btd-dock.c:593 src/ui/btd-dock.c:607 src/ui/btd-dock-menu.c:191
 #: src/ui/btd-dock-menu.c:413 src/ui/btd-prefs.c:180 src/ui/btd-prefs.c:203
 #: src/ui/btd-trash.c:260
 msgid "_Cancel"
 msgstr ""
 
-#: src/ui/btd-dock.c:607
+#: src/ui/btd-dock.c:608
 msgid "_OK"
 msgstr ""
 
-#: src/ui/btd-dock.c:775 src/ui/btd-dock.c:1424
+#: src/ui/btd-dock.c:776 src/ui/btd-dock.c:1482
 msgid "Drop applications, files or folders here"
 msgstr ""
 
-#: src/ui/btd-dock.c:1418 src/ui/btd-dock.c:1740 src/ui/btd-dock-menu.c:750
+#: src/ui/btd-dock.c:1476 src/ui/btd-dock.c:1798 src/ui/btd-dock-menu.c:750
 #: src/ui/btd-trash.c:265
 msgid "Trash"
 msgstr ""
 
-#: src/ui/btd-dock.c:1599 src/ui/btd-dock-menu.c:281
+#: src/ui/btd-dock.c:1657 src/ui/btd-dock-menu.c:281
 msgid "New Tab"
 msgstr ""
 
-#: src/ui/btd-dock.c:1599 src/ui/btd-dock-menu.c:281
+#: src/ui/btd-dock.c:1657 src/ui/btd-dock-menu.c:281
 msgid "Name of the new tab:"
 msgstr ""
 
-#: src/ui/btd-dock.c:1742
+#: src/ui/btd-dock.c:1800
 msgid "Empty"
 msgstr ""
 
-#: src/ui/btd-dock.c:1744
+#: src/ui/btd-dock.c:1802
 #, c-format
 msgid "%u item"
 msgid_plural "%u items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/ui/btd-dock.c:1749
+#: src/ui/btd-dock.c:1807
 msgid "New tab"
 msgstr ""
 
-#: src/ui/btd-dock.c:1751
+#: src/ui/btd-dock.c:1809
 msgid "Hide the shelf (it comes back when the pointer touches the edge)"
 msgstr ""
 
-#: src/ui/btd-dock.c:1758
+#: src/ui/btd-dock.c:1816
 #, c-format
 msgid "%u window"
 msgid_plural "%u windows"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/ui/btd-dock.c:1969
+#: src/ui/btd-dock.c:2028
 #, c-format
 msgid ""
 "The file %s was damaged and has been kept aside with the suffix “.broken”. "
 "The last good copy (or the default tabs) is being used."
 msgstr ""
 
-#: src/ui/btd-dock.c:1972
+#: src/ui/btd-dock.c:2031
 msgid "Dock configuration recovered"
 msgstr ""
 
@@ -445,20 +461,8 @@ msgstr ""
 msgid "Restore Default _Tabs…"
 msgstr ""
 
-#: src/ui/btd-dock-menu.c:783
+#: src/ui/btd-dock-menu.c:783 src/dockapp/btd-dockapp.c:854
 msgid "_Preferences…"
-msgstr ""
-
-#: src/ui/btd-prefs.c:53
-msgid "Primary monitor"
-msgstr ""
-
-#: src/ui/btd-prefs.c:54
-msgid "All monitors, mirrored"
-msgstr ""
-
-#: src/ui/btd-prefs.c:55
-msgid "All monitors, each with its own windows"
 msgstr ""
 
 #: src/ui/btd-prefs.c:166
@@ -499,158 +503,158 @@ msgstr ""
 msgid "_Reset"
 msgstr ""
 
-#: src/ui/btd-prefs.c:280 data/big-wm-tabbed-dock-preferences.desktop.in:3
+#: src/ui/btd-prefs.c:289 data/big-wm-tabbed-dock-preferences.desktop.in:3
 msgid "Tabbed Dock Preferences"
 msgstr ""
 
-#: src/ui/btd-prefs.c:285
+#: src/ui/btd-prefs.c:294
 msgid "_Import…"
 msgstr ""
 
-#: src/ui/btd-prefs.c:286
+#: src/ui/btd-prefs.c:295
 msgid "_Export…"
 msgstr ""
 
-#: src/ui/btd-prefs.c:287
+#: src/ui/btd-prefs.c:296
 msgid "Reset"
 msgstr ""
 
-#: src/ui/btd-prefs.c:288
+#: src/ui/btd-prefs.c:297
 msgid "_Close"
 msgstr ""
 
-#: src/ui/btd-prefs.c:303
+#: src/ui/btd-prefs.c:312
 msgid "Position, appearance, behaviour and startup"
 msgstr ""
 
-#: src/ui/btd-prefs.c:311
+#: src/ui/btd-prefs.c:320
 msgid "Position"
 msgstr ""
 
-#: src/ui/btd-prefs.c:312
+#: src/ui/btd-prefs.c:321 src/dockapp/btd-dockapp-state.c:196
 msgid "Bottom"
 msgstr ""
 
-#: src/ui/btd-prefs.c:312
+#: src/ui/btd-prefs.c:321 src/dockapp/btd-dockapp-state.c:196
 msgid "Top"
 msgstr ""
 
-#: src/ui/btd-prefs.c:313
+#: src/ui/btd-prefs.c:322
 msgid "Centre"
 msgstr ""
 
-#: src/ui/btd-prefs.c:313
+#: src/ui/btd-prefs.c:322 src/dockapp/btd-dockapp-state.c:187
 msgid "Left"
 msgstr ""
 
-#: src/ui/btd-prefs.c:313
+#: src/ui/btd-prefs.c:322 src/dockapp/btd-dockapp-state.c:185
 msgid "Right"
 msgstr ""
 
-#: src/ui/btd-prefs.c:313
+#: src/ui/btd-prefs.c:322
 msgid "Full width"
 msgstr ""
 
-#: src/ui/btd-prefs.c:318
+#: src/ui/btd-prefs.c:327
 msgid "_Edge:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:319
+#: src/ui/btd-prefs.c:328
 msgid "_Alignment:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:320
+#: src/ui/btd-prefs.c:329
 msgid "_Monitor:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:321
+#: src/ui/btd-prefs.c:330
 msgid "Reserve screen _space (maximised windows stop above the dock)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:322
+#: src/ui/btd-prefs.c:331
 msgid "Auto-_hide (show when the pointer touches the edge)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:327
+#: src/ui/btd-prefs.c:336
 msgid "Hide _delay (ms):"
 msgstr ""
 
-#: src/ui/btd-prefs.c:330
+#: src/ui/btd-prefs.c:339 src/dockapp/btd-dockapp-state.c:460
 msgid "Appearance"
 msgstr ""
 
 #. order = BtdStyle values
-#: src/ui/btd-prefs.c:332
+#: src/ui/btd-prefs.c:341
 msgid "Classic (OPENSTEP 4.0 beta)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:332
+#: src/ui/btd-prefs.c:341 src/dockapp/btd-dockapp-state.c:204
 msgid "Modern"
 msgstr ""
 
-#: src/ui/btd-prefs.c:332
+#: src/ui/btd-prefs.c:341 src/dockapp/btd-dockapp-state.c:206
 msgid "Window Maker tiles"
 msgstr ""
 
-#: src/ui/btd-prefs.c:336
+#: src/ui/btd-prefs.c:345
 msgid "St_yle:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:337
+#: src/ui/btd-prefs.c:346
 msgid "_Icon size:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:340
+#: src/ui/btd-prefs.c:349
 msgid "Spa_cing between icons:"
 msgstr ""
 
-#: src/ui/btd-prefs.c:341
+#: src/ui/btd-prefs.c:350
 msgid "Subtle a_nimations"
 msgstr ""
 
-#: src/ui/btd-prefs.c:342
+#: src/ui/btd-prefs.c:351
 msgid "Show _running applications that are not in the tab"
 msgstr ""
 
-#: src/ui/btd-prefs.c:343
+#: src/ui/btd-prefs.c:352
 msgid "Show _names under the icons"
 msgstr ""
 
-#: src/ui/btd-prefs.c:349
+#: src/ui/btd-prefs.c:358
 msgid "Behaviour"
 msgstr ""
 
-#: src/ui/btd-prefs.c:350
+#: src/ui/btd-prefs.c:359
 msgid "Clicking the active application _minimises it"
 msgstr ""
 
-#: src/ui/btd-prefs.c:351
+#: src/ui/btd-prefs.c:360
 msgid "_Keyboard shortcuts: Super+Alt+1…9, Super+Alt+PgUp/PgDn (X11)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:356
+#: src/ui/btd-prefs.c:365
 msgid ""
 "<small>On Wayland, bind <tt>big-wm-tabbed-dock --tab next</tt> (or prev, 1…"
 "9) to keys in the compositor configuration.</small>"
 msgstr ""
 
-#: src/ui/btd-prefs.c:364
+#: src/ui/btd-prefs.c:373
 msgid "Startup"
 msgstr ""
 
-#: src/ui/btd-prefs.c:365
+#: src/ui/btd-prefs.c:374
 msgid "_Start the Tabbed Dock automatically"
 msgstr ""
 
-#: src/ui/btd-prefs.c:366
+#: src/ui/btd-prefs.c:375
 msgid "Start the _classic Dock (Window Maker, wlmaker)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:367
+#: src/ui/btd-prefs.c:376
 msgid "Start _hidden (folded to the strip)"
 msgstr ""
 
-#: src/ui/btd-prefs.c:378
+#: src/ui/btd-prefs.c:387
 msgid ""
 "<small>At the next login, in the X11 and Wayland sessions. Turned off, the "
 "Tabbed Dock still opens by hand (this window, the Clip). The classic Dock "
@@ -682,6 +686,201 @@ msgstr[1] ""
 msgid "_Empty Trash"
 msgstr ""
 
+#: src/dockapp/btd-dockapp.c:601
+#, c-format
+msgid "Alignment: %s"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:610
+#, c-format
+msgid "Edge: %s"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:775 src/dockapp/btd-dockapp.c:958
+msgid "The docks change at the next login."
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:777 src/dockapp/btd-dockapp.c:960
+#, c-format
+msgid "Could not change the docks: %s"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:825
+msgid ""
+"Controller of the Tabbed Dock: alignment, edge, monitor and startup, from "
+"the Dock."
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:850
+msgid "_Show the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:857
+msgid "_Alignment"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:864
+msgid "_Edge"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:871
+msgid "_Monitor"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:883
+msgid "Hide _automatically"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:887
+msgid "_Reserve screen space"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:892
+msgid "Appea_rance"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:899
+msgid "Start_up"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:901
+msgid "_Start the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:903
+msgid "S_top the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:905
+msgid "_Restart the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:907
+msgid "At the next login:"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:918
+msgid "Tabbed Dock and classic Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:919
+msgid "Only the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:920
+msgid "Only the classic Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:931
+msgid "Restore the _default"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:938
+msgid "_Window Maker Options…"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:939
+msgid "A_bout"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1364
+msgid "Show or hide the Tabbed Dock (start it if needed)"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1365
+msgid "Start the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1366 src/dockapp/btd-dockapp-state.c:459
+msgid "Stop the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1367 src/dockapp/btd-dockapp-state.c:458
+msgid "Restart the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1368
+msgid "Open the Tabbed Dock preferences"
+msgstr ""
+
+#: src/dockapp/btd-dockapp.c:1369
+msgid "Change a preference, e.g. alignment=center"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:183
+msgid "Full Width"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:189
+msgid "Center"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:208
+msgid "Classic (OPENSTEP)"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:217
+msgid "Move the Tabbed Dock to the top"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:219
+msgid "Move the Tabbed Dock to the bottom"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:221
+msgid "Previous alignment"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:223
+msgid "Next alignment"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:225
+msgid "Open the Tabbed Dock Preferences (double click)"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:253
+msgid ""
+"The Tabbed Dock is not running.\n"
+"Double click: Preferences. Right button: start it."
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:254
+#, c-format
+msgid ""
+"Tabbed Dock\n"
+"Alignment: %s · Edge: %s\n"
+"Monitor: %s"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:458
+msgid "Show or Hide the Tabbed Dock"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:458
+msgid "Tabbed Dock Preferences..."
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:459
+msgid "Alignment"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:459
+msgid "Edge"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:459
+msgid "Monitor"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:459
+msgid "Hide automatically"
+msgstr ""
+
+#: src/dockapp/btd-dockapp-state.c:460
+msgid "Reserve screen space"
+msgstr ""
+
 #: data/big-wm-tabbed-dock.desktop.in:3
 msgid "Big Tabbed Dock"
 msgstr ""
@@ -696,4 +895,16 @@ msgstr ""
 
 #: data/big-wm-tabbed-dock-preferences.desktop.in:9
 msgid "dock;tabs;shelf;launcher;"
+msgstr ""
+
+#: data/big-wm-tabbed-dock-dockapp.desktop.in:3
+msgid "Tabbed Dock Controller"
+msgstr ""
+
+#: data/big-wm-tabbed-dock-dockapp.desktop.in:4
+msgid "Dock-app"
+msgstr ""
+
+#: data/big-wm-tabbed-dock-dockapp.desktop.in:5
+msgid "Alignment, edge, monitor and startup of the Tabbed Dock, from the Dock"
 msgstr ""

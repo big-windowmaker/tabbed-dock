@@ -451,6 +451,15 @@ btd_dockapp_wlm_changes(const BtdDockappState *st, const char *text)
     return out;
 }
 
+/* Titles of wlmaker's right-click menu (data/wlmaker/big-wm-tabbed-dock-
+ * dockapp.plist, TextDomain big-wm-tabbed-dock): listed here so xgettext
+ * puts them in the catalog. */
+const char *const btd_dockapp_wlm_titles[] = {
+    N_("Show or Hide the Tabbed Dock"), N_("Tabbed Dock Preferences..."), N_("Restart the Tabbed Dock"),
+    N_("Stop the Tabbed Dock"), N_("Alignment"), N_("Edge"), N_("Monitor"), N_("Hide automatically"),
+    N_("Reserve screen space"), N_("Appearance"), NULL,
+};
+
 char *
 btd_dockapp_icon_path(void)
 {

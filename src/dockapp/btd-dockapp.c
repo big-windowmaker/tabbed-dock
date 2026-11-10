@@ -256,9 +256,14 @@ sync_from_dock(DockApp *d)
 static void
 on_dock_appeared(GDBusConnection *c, const char *name, const char *owner, DockApp *d)
 {
+    /* found already (a command asked the bus first): the same dock */
+    if (d->dock && g_strcmp0(g_object_get_data(G_OBJECT(d->dock), "owner"), owner) == 0)
+        return;
+    g_clear_object(&d->dock);
     d->running = TRUE;
     char *path = dock_object_path();
     d->dock = g_dbus_action_group_get(c, owner, path);
+    g_object_set_data_full(G_OBJECT(d->dock), "owner", g_strdup(owner), g_free);
     g_free(path);
     g_signal_connect(d->dock, "action-state-changed", G_CALLBACK(on_dock_state_changed), d);
     g_signal_connect(d->dock, "action-added", G_CALLBACK(on_dock_action_added), d);
@@ -1249,11 +1254,36 @@ wlm_init(DockApp *d)
 
 /* ---- command line ------------------------------------------------------------ */
 
+/* A command right after starting: the asynchronous watch may not know yet
+ * whether the dock runs. Ask the bus now, so a running dock gets the change
+ * (and the file is never written behind its back). */
+static void
+find_dock_now(DockApp *d)
+{
+    if (d->running || !d->bus)
+        return;
+    GVariant *r = g_dbus_connection_call_sync(d->bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
+                                              "org.freedesktop.DBus", "GetNameOwner",
+                                              g_variant_new("(s)", dock_app_id()), G_VARIANT_TYPE("(s)"),
+                                              G_DBUS_CALL_FLAGS_NONE, 2000, NULL, NULL);
+    if (!r)
+        return; /* no owner: no dock */
+    const char *owner = NULL;
+    g_variant_get(r, "(&s)", &owner);
+    on_dock_appeared(d->bus, dock_app_id(), owner, d);
+    g_variant_unref(r);
+}
+
 /* --toggle, --start, --stop, --restart, --preferences, --set KEY=VALUE: the
  * items of wlmaker's menu (and scripts) run these. */
 static int
 run_command(DockApp *d, GVariantDict *opts, GApplicationCommandLine *cl)
 {
+    gboolean any = g_variant_dict_contains(opts, "toggle") || g_variant_dict_contains(opts, "start") ||
+                   g_variant_dict_contains(opts, "stop") || g_variant_dict_contains(opts, "restart") ||
+                   g_variant_dict_contains(opts, "preferences") || g_variant_dict_contains(opts, "set");
+    if (any)
+        find_dock_now(d);
     const char *set = NULL;
     gboolean done = FALSE;
     if (g_variant_dict_lookup(opts, "toggle", "b", &done) && done)
@@ -1284,6 +1314,8 @@ run_command(DockApp *d, GVariantDict *opts, GApplicationCommandLine *cl)
 static gboolean
 quit_idle(gpointer app)
 {
+    if (app_state.bus)
+        g_dbus_connection_flush_sync(app_state.bus, NULL, NULL); /* the call is out */
     g_application_release(G_APPLICATION(app));
     return G_SOURCE_REMOVE;
 }
