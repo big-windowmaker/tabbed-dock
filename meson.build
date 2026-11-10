@@ -28,6 +28,7 @@ core_src = files(
   'src/core/btd-coexist.c',
   'src/core/btd-launch.c',
   'src/core/btd-wmattrs.c',
+  'src/core/btd-geometry.c',
 )
 core_inc = include_directories('src/core')
 core_lib = static_library('btdcore', core_src, dependencies: [glib, gio], include_directories: core_inc)

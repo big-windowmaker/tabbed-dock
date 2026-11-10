@@ -11,7 +11,7 @@ test_env.set('LANGUAGE', '')
 test_env.set('GIO_USE_VFS', 'local')
 test_env.set('GSETTINGS_BACKEND', 'memory')
 
-foreach t : ['model', 'config', 'desktop', 'coexist', 'launch', 'wmattrs']
+foreach t : ['model', 'config', 'desktop', 'coexist', 'launch', 'wmattrs', 'geometry']
   exe = executable('test-' + t, 'test-@0@.c'.format(t), dependencies: core_dep)
   test(t, exe, env: test_env, protocol: 'tap', args: ['--tap'])
 endforeach
@@ -26,6 +26,14 @@ if get_option('dock') and get_option('dockapp') and have_dockapp
   # próprios; pulado sem eles)
   test('control', find_program('test-control.sh'),
        args: [dock_exe, meson.project_build_root() / 'src' / 'big-wm-tabbed-dock-dockapp'],
+       protocol: 'tap', timeout: 60, is_parallel: false)
+endif
+
+# Largura total no X11 com os ícones do Window Maker em volta (appicons em
+# cima da prateleira, colunas do Dock e do Clip); Xvfb e barramento próprios.
+if get_option('dock') and have_x11
+  x11_tile = executable('x11-tile', 'tools/x11-tile.c', dependencies: x11)
+  test('fullwidth', find_program('test-fullwidth.sh'), args: [dock_exe, x11_tile],
        protocol: 'tap', timeout: 60, is_parallel: false)
 endif
 

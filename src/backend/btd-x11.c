@@ -6,6 +6,7 @@
  * WM_CHANGE_STATE. No polling: everything comes from PropertyNotify.
  */
 #include "btd-windows.h"
+#include "btd-geometry.h"
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -508,16 +509,8 @@ x11_destroy(BtdWindowTracker *t)
 static BtdWmDockFunc wm_dock_func;
 static gpointer wm_dock_data;
 
-static gboolean
-is_wm_tile(XWindowAttributes *a)
-{
-    /* Window Maker's icons: square, override-redirect, the icon size */
-    return a->override_redirect && a->map_state == IsViewable && a->width == a->height && a->width >= 32 &&
-           a->width <= 160;
-}
-
 void
-btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *band, int *left, int *right)
+btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *body, int *left, int *right)
 {
     *left = *right = 0;
     if (!GDK_IS_X11_DISPLAY(display))
@@ -525,25 +518,25 @@ btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *band, int *left
     Display *dpy = GDK_DISPLAY_XDISPLAY(display);
     Window root_ret, parent, *kids = NULL;
     unsigned n = 0;
+    GArray *tiles = g_array_new(FALSE, FALSE, sizeof(BtdRect));
     gdk_x11_display_error_trap_push(display);
     if (XQueryTree(dpy, DefaultRootWindow(dpy), &root_ret, &parent, &kids, &n)) {
         for (unsigned i = 0; i < n; i++) {
             XWindowAttributes a;
-            if (!XGetWindowAttributes(dpy, kids[i], &a) || !is_wm_tile(&a))
+            /* Window Maker's icons: viewable, override-redirect, square */
+            if (!XGetWindowAttributes(dpy, kids[i], &a) || !a.override_redirect || a.map_state != IsViewable ||
+                !btd_wm_tile_like(a.width, a.height))
                 continue;
-            if (a.y + a.height <= band->y || a.y >= band->y + band->height)
-                continue; /* not in the shelf's band */
-            if (a.x + a.width <= band->x || a.x >= band->x + band->width)
-                continue;
-            if (a.x <= band->x + 2)
-                *left = MAX(*left, a.x + a.width - band->x);
-            else if (a.x + a.width >= band->x + band->width - 2)
-                *right = MAX(*right, band->x + band->width - a.x);
+            BtdRect r = { a.x, a.y, a.width, a.height };
+            g_array_append_val(tiles, r);
         }
         if (kids)
             XFree(kids);
     }
     gdk_x11_display_error_trap_pop_ignored(display);
+    BtdRect b = { body->x, body->y, body->width, body->height };
+    btd_wm_dock_margins(&b, (BtdRect *)tiles->data, tiles->len, left, right);
+    g_array_unref(tiles);
 }
 
 void
@@ -581,7 +574,7 @@ wm_dock_event(XEvent *ev)
     default:
         return;
     }
-    if (override && w == h && w >= 32 && w <= 160)
+    if (override && btd_wm_tile_like(w, h))
         wm_dock_func(wm_dock_data);
 }
 

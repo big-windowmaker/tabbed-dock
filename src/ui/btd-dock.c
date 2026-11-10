@@ -807,12 +807,16 @@ btd_dock_relayout(BtdDock *dock)
          * every alignment fits between them. On Wayland the compositor
          * leaves them out. */
         if (!dock->layer_shell) {
-            int band_h = MAX(dock->max_h, dock->height);
-            GdkRectangle band = { geo.x,
-                                  dock->prefs.edge == BTD_EDGE_TOP ? geo.y : geo.y + geo.height - band_h,
-                                  geo.width, band_h };
+            /* The shelf's body (tabs + shelf, without the shadow and the
+             * transparent rest of the window): the strip it reserves.
+             * Application icons rest on top of it, inside the work area,
+             * and must not take a tile's width off "full width". */
+            int body_h = dock->tab_h + dock->shelf_h;
+            GdkRectangle body = { geo.x,
+                                  dock->prefs.edge == BTD_EDGE_TOP ? geo.y : geo.y + geo.height - body_h,
+                                  geo.width, body_h };
             int left = 0, right = 0;
-            btd_x11_wm_dock_margins(gtk_widget_get_display(dock->window), &band, &left, &right);
+            btd_x11_wm_dock_margins(gtk_widget_get_display(dock->window), &body, &left, &right);
             if (left + right < geo.width / 2) {
                 dock->wm_left = left;
                 dock->wm_right = right;

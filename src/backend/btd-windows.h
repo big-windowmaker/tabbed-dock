@@ -101,8 +101,10 @@ BtdWindowTracker *btd_x11_tracker_new(GdkDisplay *display);
 int btd_x11_grab_shortcuts(GdkDisplay *display, BtdShortcutFunc func, gpointer data);
 void btd_x11_ungrab_shortcuts(GdkDisplay *display);
 /* Width taken by Window Maker's Dock and Clip (their columns of tiles) at
- * the left and right of band (root coordinates), for the full-width shelf. */
-void btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *band, int *left, int *right);
+ * the left and right of the shelf's body (root coordinates: the strip it
+ * reserves, not the whole window), for the full-width shelf. Rules in
+ * core/btd-geometry.h. */
+void btd_x11_wm_dock_margins(GdkDisplay *display, const GdkRectangle *body, int *left, int *right);
 typedef void (*BtdWmDockFunc)(gpointer data);
 /* Called when one of those tiles maps, moves or goes. */
 void btd_x11_set_wm_dock_func(BtdWmDockFunc func, gpointer data);
