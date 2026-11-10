@@ -1,0 +1,48 @@
+# Maintainer: Big WindowMaker <https://github.com/big-windowmaker>
+#
+# Big WM Tabbed Dock: o dock horizontal com abas (X11 e Wayland) e o
+# controlador DockApp (ladrilho do Dock: alinhamento, borda, monitor e
+# inicialização). Projeto próprio desde 0.2.0; antes vinha dentro do big-wm
+# com versão por data (26.11.x), por isso o epoch.
+#
+# Para compilar a cópia local do repositório:
+#   TABBED_DOCK_SOURCE="git+file://$PWD/.." makepkg
+pkgname=big-wm-tabbed-dock
+epoch=1
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Big WindowMaker: dock horizontal com abas (X11 e Wayland), inspirado no OPENSTEP 4.0 beta, e seu controlador no Dock"
+arch=('x86_64')
+url="https://github.com/big-windowmaker/tabbed-dock"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib2' 'gtk3' 'gdk-pixbuf2' 'cairo' 'pango' 'librsvg'
+	'libx11' 'libxext' 'wayland' 'gtk-layer-shell' 'hicolor-icon-theme')
+makedepends=('git' 'meson' 'gettext' 'wayland-protocols')
+# test-control.sh: Xvfb, dbus-daemon e gdbus (pulado sem eles)
+checkdepends=('xorg-server-xvfb' 'dbus')
+optdepends=(
+	'big-wm-session: sessão Window Maker (X11), com o controlador no Dock'
+	'big-wm-wayland: sessão wlmaker (Wayland)'
+	'windowmaker: escolher entre o Dock clássico e o dock com abas (wdwrite)'
+	'wlmaker>=1:0.8.r80.g7481afe-31: menu do controlador pelo botão direito no wlmaker (Dockapps.d)'
+)
+source=("tabbed-dock::${TABBED_DOCK_SOURCE:-git+$url.git#tag=v$pkgver}")
+sha256sums=('SKIP')
+
+build() {
+	arch-meson tabbed-dock build
+	meson compile -C build
+}
+
+check() {
+	meson test -C build --print-errorlogs
+}
+
+package() {
+	meson install -C build --destdir "$pkgdir" --no-rebuild
+	cd tabbed-dock
+	for f in docs/*.md; do
+		install -Dm644 "$f" "$pkgdir/usr/share/doc/$pkgname/${f##*/}"
+	done
+	install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}
