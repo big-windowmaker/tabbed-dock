@@ -22,6 +22,14 @@ if get_option('dock') and get_option('dockapp') and have_dockapp
   exe = executable('test-dockapp', 'test-dockapp.c', dependencies: core_dep, link_with: dockapp_state_lib,
                    include_directories: include_directories('../src/dockapp'))
   test('dockapp', exe, env: test_env, protocol: 'tap', args: ['--tap'])
+  # A cara do controlador em superfícies de imagem: desenho = regiões de
+  # clique, forma, estados, contraste, ícone grande, redesenho completo.
+  exe = executable('test-dockapp-draw', 'test-dockapp-draw.c',
+                   dependencies: [core_dep, dependency('cairo'), dependency('librsvg-2.0'),
+                                  cc.find_library('m', required: false)],
+                   link_with: [dockapp_draw_lib, dockapp_state_lib],
+                   include_directories: include_directories('../src/dockapp'))
+  test('dockapp-draw', exe, env: test_env, protocol: 'tap', args: ['--tap'])
   # API de controle por D-Bus e --set do controlador (Xvfb e barramento
   # próprios; pulado sem eles)
   test('control', find_program('test-control.sh'),

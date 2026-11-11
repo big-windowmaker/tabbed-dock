@@ -10,40 +10,77 @@
 
 /* ---- geometry ------------------------------------------------------------- *
  *
- *  4     16 17                 47 48     60
- *  ┌─────────────────── ↑ ─────────────────┐ 4
- *  └───────────────────────────────────────┘ 16
- *  ┌──────┐ ┌─────────────────┐ ┌──────┐     17
- *  │  ◀   │ │ tabbed-dock.svg │ │  ▶   │
- *  └──────┘ └─────────────────┘ └──────┘     47
- *  ┌─────────────────── ↓ ─────────────────┐ 48
- *  └───────────────────────────────────────┘ 60
+ *  4                                                   60
+ *  ┌──────────────────── display ──────────────────────┐ 4
+ *  │  ▬▬▬▬▬  the shelf at its edge, with its alignment  │
+ *  │              tabbed-dock.svg (44×33)               │
+ *  └────────────────────────────────────────────────────┘ 45
+ *  ┌─────┬─────┐  ●  ┌─────┬─────┐                        47
+ *  │  ◀  │  ▶  │     │  ▲  │  ▼  │   ◀ ▶ alignment, ▲ ▼ edge
+ *  └─────┴─────┘     └─────┴─────┘                        60
+ *  4     16    28 32 36    48    60
  *
- * 4 px around the tile, like the other dock-apps (the Dock's tile shows
- * there and in the 1 px gaps), buttons 12 px thick: big enough to hit. */
+ * 4 px around, like the other dock-apps (the Dock's tile shows there, in
+ * the gap under the display and around the lamp); buttons 12×13, the size
+ * of the buttons of YAWMPPP and WMXRES, two pairs apart so that a pair is
+ * read as one control. */
 void
 btd_dockapp_region_rect(BtdRegion region, BtdRect *r)
 {
     switch (region) {
-    case BTD_REGION_TOP:
-        *r = (BtdRect){ 4, 4, 56, 12 };
-        break;
-    case BTD_REGION_BOTTOM:
-        *r = (BtdRect){ 4, 48, 56, 12 };
-        break;
     case BTD_REGION_LEFT:
-        *r = (BtdRect){ 4, 17, 12, 30 };
+        *r = (BtdRect){ 4, 47, 12, 13 };
         break;
     case BTD_REGION_RIGHT:
-        *r = (BtdRect){ 48, 17, 12, 30 };
+        *r = (BtdRect){ 16, 47, 12, 13 };
+        break;
+    case BTD_REGION_TOP:
+        *r = (BtdRect){ 36, 47, 12, 13 };
+        break;
+    case BTD_REGION_BOTTOM:
+        *r = (BtdRect){ 48, 47, 12, 13 };
         break;
     case BTD_REGION_ICON:
-        *r = (BtdRect){ 17, 17, 30, 30 };
+        *r = (BtdRect){ 4, 4, 56, 41 };
         break;
     default:
         *r = (BtdRect){ 0, 0, 0, 0 };
         break;
     }
+}
+
+void
+btd_dockapp_led_rect(BtdRect *r)
+{
+    *r = (BtdRect){ 29, 50, 6, 6 };
+}
+
+void
+btd_dockapp_icon_rect(BtdRect *r)
+{
+    /* in the display's inside (6..58 × 6..43), between the bands of
+     * the little shelf (top and bottom, 3 px each) */
+    *r = (BtdRect){ 10, 9, BTD_DOCKAPP_ICON_W, BTD_DOCKAPP_ICON_H };
+}
+
+void
+btd_dockapp_bar_rect(BtdAlign align, BtdEdge edge, BtdRect *r)
+{
+    int x, w;
+    btd_dockapp_bar_geometry(align, 7, 50, &x, &w);
+    *r = (BtdRect){ x, edge == BTD_EDGE_TOP ? 7 : 41, w, 2 };
+}
+
+int
+btd_dockapp_shape(BtdRect rects[6])
+{
+    static const BtdRegion parts[] = { BTD_REGION_ICON, BTD_REGION_LEFT, BTD_REGION_RIGHT, BTD_REGION_TOP,
+                                       BTD_REGION_BOTTOM };
+    int n = 0;
+    for (guint i = 0; i < G_N_ELEMENTS(parts); i++)
+        btd_dockapp_region_rect(parts[i], &rects[n++]);
+    btd_dockapp_led_rect(&rects[n++]);
+    return n;
 }
 
 BtdRegion

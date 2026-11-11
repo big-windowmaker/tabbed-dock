@@ -50,18 +50,23 @@ test_strings(void)
 static void
 test_regions(void)
 {
-    /* ↑ top, ↓ bottom, ◀ ▶ on the sides, the icon in the middle */
-    g_assert_cmpint(btd_dockapp_region_at(32, 8), ==, BTD_REGION_TOP);
-    g_assert_cmpint(btd_dockapp_region_at(32, 55), ==, BTD_REGION_BOTTOM);
-    g_assert_cmpint(btd_dockapp_region_at(8, 32), ==, BTD_REGION_LEFT);
-    g_assert_cmpint(btd_dockapp_region_at(55, 32), ==, BTD_REGION_RIGHT);
-    g_assert_cmpint(btd_dockapp_region_at(32, 32), ==, BTD_REGION_ICON);
-    /* the margin and the gaps: the tile (the window manager's) */
+    /* the display (the icon) on top; under it ◀ ▶, the lamp, ▲ ▼ */
+    g_assert_cmpint(btd_dockapp_region_at(32, 24), ==, BTD_REGION_ICON);
+    g_assert_cmpint(btd_dockapp_region_at(5, 5), ==, BTD_REGION_ICON);
+    g_assert_cmpint(btd_dockapp_region_at(59, 44), ==, BTD_REGION_ICON);
+    g_assert_cmpint(btd_dockapp_region_at(9, 53), ==, BTD_REGION_LEFT);
+    g_assert_cmpint(btd_dockapp_region_at(21, 53), ==, BTD_REGION_RIGHT);
+    g_assert_cmpint(btd_dockapp_region_at(41, 53), ==, BTD_REGION_TOP);
+    g_assert_cmpint(btd_dockapp_region_at(53, 53), ==, BTD_REGION_BOTTOM);
+    /* the margin, the gap under the display and the lamp: no control (a
+     * click there does nothing, a drag moves the tile) */
     g_assert_cmpint(btd_dockapp_region_at(1, 1), ==, BTD_REGION_NONE);
-    g_assert_cmpint(btd_dockapp_region_at(32, 16), ==, BTD_REGION_NONE);
-    g_assert_cmpint(btd_dockapp_region_at(16, 32), ==, BTD_REGION_NONE);
+    g_assert_cmpint(btd_dockapp_region_at(32, 45), ==, BTD_REGION_NONE);
+    g_assert_cmpint(btd_dockapp_region_at(32, 46), ==, BTD_REGION_NONE);
+    g_assert_cmpint(btd_dockapp_region_at(32, 53), ==, BTD_REGION_NONE);
     g_assert_cmpint(btd_dockapp_region_at(63, 63), ==, BTD_REGION_NONE);
-    /* every region inside the tile, none overlapping, buttons ≥ 12 px */
+    /* every region inside the tile's 4 px margin, none overlapping, buttons
+     * at least 12 px each way; the display is most of the tile */
     const BtdRegion all[] = { BTD_REGION_TOP, BTD_REGION_BOTTOM, BTD_REGION_LEFT, BTD_REGION_RIGHT, BTD_REGION_ICON };
     for (guint i = 0; i < G_N_ELEMENTS(all); i++) {
         BtdRect r;
@@ -75,6 +80,16 @@ test_regions(void)
             for (int x = r.x; x < r.x + r.width; x++)
                 g_assert_cmpint(btd_dockapp_region_at(x, y), ==, all[i]);
     }
+    BtdRect w, ir;
+    btd_dockapp_region_rect(BTD_REGION_ICON, &w);
+    g_assert_cmpint(w.width * w.height, >=, 56 * 40);
+    /* the icon, 44 px wide (it was 22), inside the display */
+    btd_dockapp_icon_rect(&ir);
+    g_assert_cmpint(ir.width, >=, 42);
+    g_assert_cmpint(ir.x, >=, w.x);
+    g_assert_cmpint(ir.y, >=, w.y);
+    g_assert_cmpint(ir.x + ir.width, <=, w.x + w.width);
+    g_assert_cmpint(ir.y + ir.height, <=, w.y + w.height);
 }
 
 static void
