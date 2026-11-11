@@ -25,16 +25,21 @@
 
 ### O controlador
 
+Um pequeno painel de instrumentos OPENSTEP: o `tabbed-dock.svg` grande num
+visor escuro, e embaixo dois pares de botões com uma lâmpada entre eles.
+
 ```
-┌──────────── ↑ ────────────┐   ↑ / ↓   borda: em cima / embaixo
-│ ◀ │  tabbed-dock.svg  │ ▶ │   ◀ / ▶   alinhamento: Largura total → Direita → Centro → Esquerda
-└──────────── ↓ ────────────┘   clique duplo no ícone: Preferências
+┌──────────────────────────────┐
+│ ▬▬▬    tabbed-dock.svg        │   visor: o ícone e a prateleira em miniatura
+└──────────────────────────────┘   (na borda e no alinhamento atuais)
+[◀][▶]  ●  [▲][▼]                  ◀ ▶ alinhamento: Largura total → Direita → Centro → Esquerda
+                                   ▲ ▼ borda (a atual fica afundada); ● ligado / oculto / parado
 ```
 
-- **◀ ▶** trocam o alinhamento na hora (a roda do mouse também), **↑ ↓** a borda.
+- **◀ ▶** trocam o alinhamento na hora (a roda do mouse também), **▲ ▼** a borda.
 - **Clique duplo** no ícone abre as Preferências do Dock com Abas (uma janela só). Um clique simples mostra o estado.
 - **Botão direito**: Mostrar/ocultar, Preferências, Alinhamento, Borda, Monitor, Ocultar automaticamente, Reservar espaço na tela, Aparência, Inicialização (iniciar, parar, reiniciar; docks da próxima sessão) e as opções do Window Maker. No wlmaker, o menu do próprio wlmaker (botão direito na borda do ladrilho) traz as mesmas opções, por `Dockapps.d`.
-- O estado aparece no ladrilho: a seta da borda atual em destaque e uma prateleira em miniatura no alinhamento atual. Acompanha o tema claro e escuro.
+- O estado aparece no ladrilho: o botão da borda atual fica afundado, a prateleira em miniatura no visor mostra a borda e o alinhamento, e a lâmpada acende com o dock rodando (âmbar se oculto, apagada e com o visor escurecido se parado). Acompanha o tema claro e escuro.
 - Fala com o dock pelas ações dele no D-Bus: o que muda no controlador aparece nas Preferências, e vice-versa. Sem o dock rodando, edita a configuração.
 
 ```sh
@@ -65,7 +70,7 @@ Preferências e o controlador. Ver [docs/uso-e-configuracao.md](docs/uso-e-confi
 ## Documentação
 
 [docs/](docs/) — arquitetura, uso, X11 e Wayland, testes, e as etapas do controlador
-(`01-auditoria.md` a `17-controlador-wayland.md`, `RELATORIO-FINAL.md`).
+(`01-auditoria.md` a `17-controlador-wayland.md`, `RELATORIO-FINAL.md`; o redesenho do controlador em `16-auditoria-visual-dockapp.md` a `21-relatorio-final-redesign-dockapp.md`).
 
 ## História
 
