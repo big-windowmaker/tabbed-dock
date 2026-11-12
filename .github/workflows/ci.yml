@@ -35,7 +35,7 @@ jobs:
 
       - name: Empacotar
         run: |
-          su builder -c "cd pkgbuild && TABBED_DOCK_SOURCE='git+file://$GITHUB_WORKSPACE#commit=$GITHUB_SHA' makepkg --nodeps --noconfirm"
+          su builder -c "cd pkgbuild && PACKAGER='Big WindowMaker <rruscher@gmail.com>' TABBED_DOCK_SOURCE='git+file://$GITHUB_WORKSPACE#commit=$GITHUB_SHA' makepkg --nodeps --noconfirm"
           # A época (1:) põe ":" no nome, que o upload-artifact recusa: troca
           # por "_" (como no big-windowmaker/packages; o pacman lê a versão do
           # .PKGINFO, não do nome).
