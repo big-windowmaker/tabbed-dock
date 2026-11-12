@@ -37,6 +37,7 @@
 #include "btd-defaults.h"
 #include "btd-dockapp.h"
 #include "btd-dockapp-draw.h"
+#include "btd-about.h"
 
 #define DOCK_APP_ID "io.github.big_windowmaker.TabbedDock"
 #define DOCK_PATH "/io/github/big_windowmaker/TabbedDock"
@@ -690,12 +691,7 @@ radio(GtkWidget *menu, GSList *group, const char *label, const char *value, gboo
 static void
 on_about(DockApp *d)
 {
-    gtk_show_about_dialog(NULL, "program-name", _("Tabbed Dock"), "version", BTD_VERSION, "logo-icon-name",
-                          "big-wm-tabbed-dock", "comments",
-                          _("Controller of the Tabbed Dock: alignment, edge, monitor and startup, from the Dock."),
-                          "license-type", GTK_LICENSE_GPL_2_0, "website",
-                          "https://github.com/big-windowmaker/tabbed-dock", "authors",
-                          (const char *[]){ "Rafael Ruscher <rruscher@gmail.com>", "Big WindowMaker", NULL }, NULL);
+    btd_about_show(NULL);
 }
 
 static void

@@ -1,4 +1,5 @@
 src/core/btd-model.c
+src/ui/btd-about.c
 src/ui/btd-app.c
 src/ui/btd-control.c
 src/ui/btd-dock.c
