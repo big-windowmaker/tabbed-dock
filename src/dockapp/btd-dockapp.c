@@ -1,12 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * big-wm-tabbed-dock-dockapp — the Tabbed Dock's controller, a classic
- * Window Maker dock-app (64×64 tile, OPENSTEP buttons):
+ * Window Maker dock-app (64×64 tile), a small OPENSTEP instrument panel:
  *
- *        ┌──────────── ↑ ────────────┐   ↑ / ↓   edge: top / bottom
- *        │ ◀ │  tabbed-dock.svg  │ ▶ │   ◀ / ▶   alignment, in the order
- *        └──────────── ↓ ────────────┘           fill → right → center → left
- *   double click on the icon: Preferences; right button: menu.
+ *        ┌──────────────────────────────┐
+ *        │  ▬▬  tabbed-dock.svg         │   the display: the icon, and the
+ *        └──────────────────────────────┘   shelf at its edge and alignment
+ *        [◀][▶]  ●  [▲][▼]                  ◀ ▶ alignment (fill → right →
+ *                                           center → left), ▲ ▼ edge; the
+ *   lamp: running / hidden / stopped.       current edge stays latched.
+ *   double click on the display: Preferences; right button: menu.
  *
  * An X11 dock-app (withdrawn leader with an icon window): Window Maker docks
  * it, and wlmaker docks it through XWayland. It drives the running dock
@@ -33,6 +36,8 @@
 #include "btd-config.h"
 #include "btd-defaults.h"
 #include "btd-dockapp.h"
+#include "btd-dockapp-draw.h"
+#include "btd-about.h"
 
 #define DOCK_APP_ID "io.github.big_windowmaker.TabbedDock"
 #define DOCK_PATH "/io/github/big_windowmaker/TabbedDock"
@@ -51,7 +56,7 @@ typedef struct {
     int depth;
     Visual *visual;
     Pixmap pixmap;
-    RsvgHandle *svg;
+    cairo_surface_t *icon_image; /* tabbed-dock.svg, rendered once */
     gboolean dark;
     GFileMonitor *theme_monitor;
 
@@ -284,164 +289,25 @@ on_dock_vanished(GDBusConnection *c, const char *name, DockApp *d)
 
 /* ---- drawing -------------------------------------------------------------- */
 
-typedef struct {
-    double face[3], hi[3], sh[3], outer[3], arrow[3], accent[3], well[3], well_sh[3], well_hi[3];
-} Palette;
-
-static void
-palette(DockApp *d, Palette *p)
-{
-    /* OPENSTEP grey (Window Maker's buttons), and its dark variant */
-    static const Palette light = {
-        { 0.73, 0.73, 0.73 }, { 1, 1, 1 }, { 0.38, 0.38, 0.38 }, { 0, 0, 0 },
-        { 0, 0, 0 }, { 0.0, 0.43, 0.42 }, { 0.62, 0.62, 0.62 }, { 0.33, 0.33, 0.33 }, { 0.92, 0.92, 0.92 } };
-    static const Palette dark = {
-        { 0.30, 0.30, 0.31 }, { 0.47, 0.47, 0.48 }, { 0.14, 0.14, 0.15 }, { 0, 0, 0 },
-        { 0.90, 0.90, 0.90 }, { 0.24, 0.80, 0.78 }, { 0.20, 0.20, 0.21 }, { 0.08, 0.08, 0.08 }, { 0.36, 0.36, 0.37 } };
-    *p = d->dark ? dark : light;
-}
-
-static void
-rgb(cairo_t *cr, const double *c)
-{
-    cairo_set_source_rgb(cr, c[0], c[1], c[2]);
-}
-
-/* A Window Maker button: white top/left, grey and black bottom/right;
- * pressed, the other way round. */
-static void
-bevel(cairo_t *cr, const Palette *p, const BtdRect *r, gboolean pressed)
-{
-    double x = r->x, y = r->y, w = r->width, h = r->height;
-    rgb(cr, p->face);
-    cairo_rectangle(cr, x, y, w, h);
-    cairo_fill(cr);
-    cairo_set_line_width(cr, 1);
-    rgb(cr, pressed ? p->outer : p->hi);
-    cairo_move_to(cr, x + 0.5, y + h - 0.5);
-    cairo_line_to(cr, x + 0.5, y + 0.5);
-    cairo_line_to(cr, x + w - 0.5, y + 0.5);
-    cairo_stroke(cr);
-    rgb(cr, pressed ? p->hi : p->outer);
-    cairo_move_to(cr, x + w - 0.5, y + 0.5);
-    cairo_line_to(cr, x + w - 0.5, y + h - 0.5);
-    cairo_line_to(cr, x + 0.5, y + h - 0.5);
-    cairo_stroke(cr);
-    rgb(cr, pressed ? p->face : p->sh);
-    cairo_move_to(cr, x + w - 1.5, y + 1.5);
-    cairo_line_to(cr, x + w - 1.5, y + h - 1.5);
-    cairo_line_to(cr, x + 1.5, y + h - 1.5);
-    cairo_stroke(cr);
-}
-
-static void
-arrow(cairo_t *cr, const BtdRect *r, BtdRegion dir, gboolean pressed, const double *color)
-{
-    double cx = r->x + r->width / 2.0 + (pressed ? 1 : 0), cy = r->y + r->height / 2.0 + (pressed ? 1 : 0);
-    const double a = 4.5, b = 3; /* half base, height from the centre */
-    switch (dir) {
-    case BTD_REGION_TOP:
-        cairo_move_to(cr, cx, cy - b);
-        cairo_line_to(cr, cx + a, cy + b);
-        cairo_line_to(cr, cx - a, cy + b);
-        break;
-    case BTD_REGION_BOTTOM:
-        cairo_move_to(cr, cx, cy + b);
-        cairo_line_to(cr, cx + a, cy - b);
-        cairo_line_to(cr, cx - a, cy - b);
-        break;
-    case BTD_REGION_LEFT:
-        cairo_move_to(cr, cx - b, cy);
-        cairo_line_to(cr, cx + b, cy - a);
-        cairo_line_to(cr, cx + b, cy + a);
-        break;
-    default:
-        cairo_move_to(cr, cx + b, cy);
-        cairo_line_to(cr, cx - b, cy - a);
-        cairo_line_to(cr, cx - b, cy + a);
-        break;
-    }
-    cairo_close_path(cr);
-    cairo_set_source_rgb(cr, color[0], color[1], color[2]);
-    cairo_fill(cr);
-}
-
 static void
 draw(DockApp *d, cairo_t *cr)
 {
-    Palette p;
-    palette(d, &p);
-    cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
-    cairo_set_source_rgb(cr, 0, 0, 0);
-    cairo_paint(cr); /* outside the shape: never shown */
-
-    static const BtdRegion buttons[] = { BTD_REGION_TOP, BTD_REGION_BOTTOM, BTD_REGION_LEFT, BTD_REGION_RIGHT };
-    for (guint i = 0; i < G_N_ELEMENTS(buttons); i++) {
-        BtdRect r;
-        btd_dockapp_region_rect(buttons[i], &r);
-        gboolean pressed = d->press_region == buttons[i] && !d->dragged;
-        bevel(cr, &p, &r, pressed);
-        /* the arrow of the current edge in the accent colour */
-        gboolean current = (buttons[i] == BTD_REGION_TOP && d->st.edge == BTD_EDGE_TOP) ||
-                           (buttons[i] == BTD_REGION_BOTTOM && d->st.edge == BTD_EDGE_BOTTOM);
-        arrow(cr, &r, buttons[i], pressed, current ? p.accent : p.arrow);
-    }
-
-    /* the well with the icon, sunken */
-    BtdRect w;
-    btd_dockapp_region_rect(BTD_REGION_ICON, &w);
-    rgb(cr, &p.well[0]);
-    cairo_rectangle(cr, w.x, w.y, w.width, w.height);
-    cairo_fill(cr);
-    cairo_set_line_width(cr, 1);
-    rgb(cr, p.well_sh);
-    cairo_move_to(cr, w.x + 0.5, w.y + w.height - 0.5);
-    cairo_line_to(cr, w.x + 0.5, w.y + 0.5);
-    cairo_line_to(cr, w.x + w.width - 0.5, w.y + 0.5);
-    cairo_stroke(cr);
-    rgb(cr, p.well_hi);
-    cairo_move_to(cr, w.x + w.width - 0.5, w.y + 0.5);
-    cairo_line_to(cr, w.x + w.width - 0.5, w.y + w.height - 0.5);
-    cairo_line_to(cr, w.x + 0.5, w.y + w.height - 0.5);
-    cairo_stroke(cr);
-
-    /* the icon; dimmed while the dock is not running */
-    const int is = BTD_DOCKAPP_ICON;
-    double ix = w.x + (w.width - is) / 2.0, iy = w.y + (w.height - is) / 2.0;
-    iy += d->st.edge == BTD_EDGE_TOP ? 1 : -1; /* room for the bar */
-    if (d->svg) {
-        RsvgRectangle vp = { ix, iy, is, is };
-        cairo_push_group(cr);
-        rsvg_handle_render_document(d->svg, cr, &vp, NULL);
-        cairo_pop_group_to_source(cr);
-        cairo_paint_with_alpha(cr, d->running ? 1.0 : 0.45);
-    }
-
-    /* a small preview of the shelf: at its edge, with its alignment */
-    if (d->running) {
-        int bx, bw;
-        btd_dockapp_bar_geometry(d->st.align, w.x + 2, w.width - 4, &bx, &bw);
-        int by = d->st.edge == BTD_EDGE_TOP ? w.y + 2 : w.y + w.height - 4;
-        rgb(cr, p.accent);
-        cairo_rectangle(cr, bx, by, bw, 2);
-        cairo_fill(cr);
-    }
+    BtdDockappLook look = { .st = &d->st, .dark = d->dark, .running = d->running,
+                            .pressed = d->dragged ? BTD_REGION_NONE : d->press_region, .hover = d->hover_region };
+    btd_dockapp_draw(cr, &look, d->icon_image);
 }
 
 static void
 apply_shape(DockApp *d)
 {
-    XRectangle rects[5];
-    static const BtdRegion all[] = { BTD_REGION_TOP, BTD_REGION_BOTTOM, BTD_REGION_LEFT, BTD_REGION_RIGHT,
-                                     BTD_REGION_ICON };
-    for (guint i = 0; i < G_N_ELEMENTS(all); i++) {
-        BtdRect r;
-        btd_dockapp_region_rect(all[i], &r);
-        rects[i] = (XRectangle){ r.x, r.y, r.width, r.height };
-    }
-    /* the gaps between the buttons and around them show the tile (and so
-     * the theme of the dock) */
-    XShapeCombineRectangles(d->dpy, d->icon, ShapeBounding, 0, 0, rects, 5, ShapeSet, Unsorted);
+    /* the gaps under the display and around the lamp, and the margin, show
+     * the tile (and so the theme of the Dock) */
+    BtdRect r[6];
+    int n = btd_dockapp_shape(r);
+    XRectangle rects[6];
+    for (int i = 0; i < n; i++)
+        rects[i] = (XRectangle){ r[i].x, r[i].y, r[i].width, r[i].height };
+    XShapeCombineRectangles(d->dpy, d->icon, ShapeBounding, 0, 0, rects, n, ShapeSet, Unsorted);
 }
 
 static void
@@ -825,12 +691,7 @@ radio(GtkWidget *menu, GSList *group, const char *label, const char *value, gboo
 static void
 on_about(DockApp *d)
 {
-    gtk_show_about_dialog(NULL, "program-name", _("Tabbed Dock"), "version", BTD_VERSION, "logo-icon-name",
-                          "big-wm-tabbed-dock", "comments",
-                          _("Controller of the Tabbed Dock: alignment, edge, monitor and startup, from the Dock."),
-                          "license-type", GTK_LICENSE_GPL_2_0, "website",
-                          "https://github.com/big-windowmaker/tabbed-dock", "authors",
-                          (const char *[]){ "Rafael Ruscher <rruscher@gmail.com>", "Big WindowMaker", NULL }, NULL);
+    btd_about_show(NULL);
 }
 
 static void
@@ -990,6 +851,12 @@ show_menu_idle(gpointer data)
 
 /* ---- pointer --------------------------------------------------------------- */
 
+static gboolean
+is_button(BtdRegion r)
+{
+    return r == BTD_REGION_TOP || r == BTD_REGION_BOTTOM || r == BTD_REGION_LEFT || r == BTD_REGION_RIGHT;
+}
+
 static void
 on_press(DockApp *d, XButtonEvent *ev)
 {
@@ -1034,7 +901,10 @@ on_motion(DockApp *d, XMotionEvent *ev)
         return;
     }
     if (r != d->hover_region) {
+        gboolean lit = is_button(r) || is_button(d->hover_region);
         d->hover_region = r;
+        if (lit)
+            redraw(d); /* the button under the pointer lights up a little */
         if (d->tip_id)
             g_source_remove(d->tip_id);
         d->tip_id = 0;
@@ -1121,6 +991,10 @@ x_filter(GdkXEvent *xevent, GdkEvent *event, gpointer data)
         on_motion(d, &ev->xmotion);
         return GDK_FILTER_REMOVE;
     case LeaveNotify:
+        if (is_button(d->hover_region)) {
+            d->hover_region = BTD_REGION_NONE;
+            redraw(d);
+        }
         d->hover_region = BTD_REGION_NONE;
         if (d->tip_id) {
             g_source_remove(d->tip_id);
@@ -1356,8 +1230,9 @@ on_startup(GApplication *gapp, DockApp *d)
     g_object_unref(f);
     g_free(path);
     char *svg = btd_dockapp_icon_path();
-    if (svg)
-        d->svg = rsvg_handle_new_from_file(svg, NULL);
+    RsvgHandle *handle = svg ? rsvg_handle_new_from_file(svg, NULL) : NULL;
+    d->icon_image = btd_dockapp_icon_new(handle); /* the handle is not needed after */
+    g_clear_object(&handle);
     g_free(svg);
     load_from_file(d);
     d->bus = g_application_get_dbus_connection(gapp);

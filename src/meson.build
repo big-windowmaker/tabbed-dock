@@ -10,6 +10,7 @@ wl_protocols = dependency('wayland-protocols', version: '>= 1.36', required: get
 wl_scanner = find_program('wayland-scanner', native: true, required: get_option('wayland'))
 
 dock_src = files(
+  'ui/btd-about.c',
   'ui/btd-app.c',
   'ui/btd-control.c',
   'ui/btd-dock.c',
@@ -75,11 +76,14 @@ have_dockapp = get_option('dockapp') and have_x11
 if have_dockapp
   dockapp_state_lib = static_library('btddockappstate', files('dockapp/btd-dockapp-state.c'),
     dependencies: core_dep, include_directories: include_directories('dockapp'))
-  executable('big-wm-tabbed-dock-dockapp', files('dockapp/btd-dockapp.c'),
+  # its face (Cairo and librsvg, no X11), tested on image surfaces
+  dockapp_draw_lib = static_library('btddockappdraw', files('dockapp/btd-dockapp-draw.c'),
+    dependencies: [core_dep, dependency('cairo'), rsvg], include_directories: include_directories('dockapp'))
+  executable('big-wm-tabbed-dock-dockapp', files('dockapp/btd-dockapp.c', 'ui/btd-about.c'),
     dependencies: [core_dep, gtk, gtk_x11, x11, dependency('xext'), dependency('cairo-xlib'), rsvg,
                    cc.find_library('m', required: false)],
-    link_with: dockapp_state_lib,
-    include_directories: include_directories('dockapp'),
+    link_with: [dockapp_draw_lib, dockapp_state_lib],
+    include_directories: include_directories('dockapp', 'ui'),
     install: true)
 endif
 

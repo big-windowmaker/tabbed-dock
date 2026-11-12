@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 project('big-wm-tabbed-dock', 'c',
-  version: '0.2.0',
+  version: '0.3.0',
   license: 'GPL-2.0-or-later',
   meson_version: '>= 0.62',
   default_options: ['c_std=gnu11', 'warning_level=2', 'buildtype=debugoptimized', 'b_ndebug=if-release'])
@@ -28,6 +28,7 @@ core_src = files(
   'src/core/btd-coexist.c',
   'src/core/btd-launch.c',
   'src/core/btd-wmattrs.c',
+  'src/core/btd-geometry.c',
 )
 core_inc = include_directories('src/core')
 core_lib = static_library('btdcore', core_src, dependencies: [glib, gio], include_directories: core_inc)

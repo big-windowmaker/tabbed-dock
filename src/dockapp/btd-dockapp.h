@@ -10,7 +10,10 @@
 G_BEGIN_DECLS
 
 #define BTD_DOCKAPP_SIZE 64
-#define BTD_DOCKAPP_ICON 22 /* tabbed-dock.svg, in the well */
+/* tabbed-dock.svg in the display: its drawing (viewBox 4..60 × 12..54,
+ * the shelf and its shadow) 44 px wide */
+#define BTD_DOCKAPP_ICON_W 44
+#define BTD_DOCKAPP_ICON_H 33
 
 typedef enum {
     BTD_REGION_NONE,
@@ -18,7 +21,7 @@ typedef enum {
     BTD_REGION_BOTTOM, /* ↓ edge: bottom */
     BTD_REGION_LEFT,   /* ◀ previous alignment */
     BTD_REGION_RIGHT,  /* ▶ next alignment */
-    BTD_REGION_ICON,   /* double click: preferences */
+    BTD_REGION_ICON,   /* the display with the icon; double click: preferences */
 } BtdRegion;
 
 typedef struct {
@@ -43,8 +46,17 @@ typedef struct {
 
 void btd_dockapp_region_rect(BtdRegion region, BtdRect *rect);
 BtdRegion btd_dockapp_region_at(int x, int y);
-/* The little shelf in the well: x and width of a bar in [x0, x0 + width). */
+/* The status lamp between the two pairs of buttons (not a control). */
+void btd_dockapp_led_rect(BtdRect *rect);
+/* Where tabbed-dock.svg is drawn, in the display. */
+void btd_dockapp_icon_rect(BtdRect *rect);
+/* The little shelf in the display: at the dock's edge, with its alignment. */
+void btd_dockapp_bar_rect(BtdAlign align, BtdEdge edge, BtdRect *rect);
+/* x and width of a bar in [x0, x0 + width) for an alignment. */
 void btd_dockapp_bar_geometry(BtdAlign align, int x0, int width, int *bx, int *bw);
+/* The window's shape: what is drawn (the display, the buttons, the lamp);
+ * the rest shows the tile of the Dock. Returns how many (at most 6). */
+int btd_dockapp_shape(BtdRect rects[6]);
 
 void btd_dockapp_state_clear(BtdDockappState *st);
 void btd_dockapp_state_from_prefs(BtdDockappState *st, const BtdPrefs *prefs);

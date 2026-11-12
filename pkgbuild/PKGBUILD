@@ -1,4 +1,6 @@
-# Maintainer: Big WindowMaker <https://github.com/big-windowmaker>
+# Maintainer: Rafael Ruscher <rruscher@gmail.com>
+# Maintainer: Barnabé Di Kartola <barnabedikartola@gmail.com>
+# Big WindowMaker: https://github.com/big-windowmaker
 #
 # Big WM Tabbed Dock: o dock horizontal com abas (X11 e Wayland) e o
 # controlador DockApp (ladrilho do Dock: alinhamento, borda, monitor e
@@ -9,7 +11,7 @@
 #   TABBED_DOCK_SOURCE="git+file://$PWD/.." makepkg
 pkgname=big-wm-tabbed-dock
 epoch=1
-pkgver=0.2.0
+pkgver=0.3.0
 pkgrel=1
 pkgdesc="Big WindowMaker: dock horizontal com abas (X11 e Wayland), inspirado no OPENSTEP 4.0 beta, e seu controlador no Dock"
 arch=('x86_64')

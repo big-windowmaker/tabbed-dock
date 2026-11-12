@@ -2,6 +2,7 @@
 /*
  * Context menus of tabs, items, running applications and the empty shelf.
  */
+#include "btd-about.h"
 #include "btd-dock.h"
 #include "btd-trash.h"
 
@@ -433,6 +434,7 @@ add_paths(MenuCtx *m, GtkFileChooserAction action, const char *title)
 static void do_add_files(MenuCtx *m) { add_paths(m, GTK_FILE_CHOOSER_ACTION_OPEN, _("Add Files")); }
 static void do_add_folder(MenuCtx *m) { add_paths(m, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, _("Add Folders")); }
 static void do_prefs(MenuCtx *m) { btd_dock_show_preferences(m->dock); }
+static void do_about(MenuCtx *m) { btd_about_show(NULL); }
 
 /* ---- builders ------------------------------------------------------------- */
 
@@ -781,6 +783,7 @@ btd_dock_popup_menu(BtdDock *dock, int slot_index, const GdkEvent *event)
     add_separator(menu);
     add_item(menu, _("Restore Default _Tabs…"), G_CALLBACK(do_restore_all), m);
     add_item(menu, _("_Preferences…"), G_CALLBACK(do_prefs), m);
+    add_item(menu, _("_About the Tabbed Dock"), G_CALLBACK(do_about), m);
 
     dock->menu_open = TRUE;
     g_signal_connect(menu, "deactivate", G_CALLBACK(on_menu_deactivate), dock);

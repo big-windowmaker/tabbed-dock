@@ -4,27 +4,38 @@ Um dockapp clássico: janela líder *withdrawn* com `WM_CLASS
 big-wm-tabbed-dock-dockapp.DockApp` e uma *icon window* de 64×64, que o
 Window Maker (e o wlmaker, pelo XWayland) adota no Dock.
 
+Desde o redesenho de 11/2026 ([16](16-auditoria-visual-dockapp.md) a
+[21](21-relatorio-final-redesign-dockapp.md)): um painel de instrumentos
+OPENSTEP, na linha do YAWMPPP e do WMXRES.
+
 ```
- ┌────────────────────────────┐
- │        ▲  (4,4 56×12)      │   ↑  borda de cima
- │ ◀ ┌──────────────────┐ ▶   │   ◀ ▶ (4,17 / 48,17, 12×30)
- │   │  tabbed-dock.svg │     │   ícone (17,17 30×30)
- │   └──────────────────┘     │
- │        ▼  (4,48 56×12)     │   ↓  borda de baixo
- └────────────────────────────┘
+ 4                                                  60
+ ┌──────────────────── visor (4,4 56×41) ───────────┐   clique duplo: Preferências
+ │  ▬▬▬  prateleira em miniatura (borda, alinhamento) │   clique: estado; roda: ◀ ▶
+ │            tabbed-dock.svg 44×33 (10,9)           │
+ └───────────────────────────────────────────────────┘ 45
+ [◀ 4,47][▶ 16,47]  ● 29,50  [▲ 36,47][▼ 48,47]       botões 12×13
 ```
 
-- Fundo desenhado com Cairo num pixmap do X (`cairo-xlib`), botões em relevo
-  no estilo OPENSTEP. Uma **forma** (XShape) deixa as margens e os vãos
-  transparentes: o ladrilho do tema aparece por trás.
-- Estado visível: a seta da borda atual em destaque e uma prateleira em
-  miniatura na posição do alinhamento atual; dock oculto = ícone esmaecido.
+- Desenho em `src/dockapp/btd-dockapp-draw.c` (Cairo, sem X11, testado em
+  superfícies de imagem por `tests/test-dockapp-draw.c`); geometria e regiões
+  em `btd-dockapp-state.c`; o X11 só copia o pixmap para a janela.
+- O SVG é rasterizado **uma vez**, no tamanho do visor, ao iniciar; cada
+  redesenho só compõe a imagem guardada.
+- Botões em relevo do Window Maker; a borda atual fica **afundada** (botão de
+  estado), com a seta na cor de destaque. Passar o ponteiro clareia o botão;
+  apertar o afunda e desloca a seta 1 px.
+- Lâmpada: verde-água com o dock rodando, âmbar com ele oculto, apagada com
+  ele parado (o visor escurece, como uma tela sem sinal).
+- Uma **forma** (XShape) deixa a margem, o vão sob o visor e o redor da
+  lâmpada transparentes: o ladrilho do tema aparece por trás.
 - Dicas (*tooltips*) ao lado do ladrilho, nunca por cima (uma dica por cima
   roubava o clique seguinte — corrigido posicionando a janela no
   `size-allocate`).
 - Avisos curtos (1,6 s) depois de cada ação ("Centro", "Em cima"...).
 - Tema claro/escuro: segue `~/.config/big-wm/theme` (`GFileMonitor`), troca na
-  hora.
+  hora. O visor é escuro nos dois temas; a moldura e os botões são cinza
+  metálico no claro e grafite no escuro.
 
 ## Entrada
 
