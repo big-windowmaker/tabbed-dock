@@ -4,6 +4,19 @@ Formato livre, uma seção por versão; datas no fuso de Brasília. O pacote
 `big-wm-tabbed-dock` usa `epoch=1` desde 0.2.0 (antes, vinha no big-wm com
 versão por data).
 
+## 0.3.1 — 2026-11-14
+
+- Abas sem os "triângulos" de papel de parede entre elas: as abas vizinhas
+  se sobrepõem por uma inclinação (a da esquerda na frente, como abas de
+  pasta), nos estilos clássico e tiles. Lado a lado, as laterais inclinadas
+  deixavam um vão em V entre cada duas abas. O clique segue o que está
+  desenhado na frente.
+- Corrigida a queda do dock (SIGSEGV em `g_str_hash` dentro do desenho)
+  quando uma janela sumia ou trocava de `WM_CLASS` enquanto o dock se
+  redesenhava, por exemplo ao abrir e fechar o instalador na ISO live: a
+  janela era liberada antes de o dock refazer seus grupos. Agora o
+  rastreador só a libera depois do aviso (`tests/test-windows.c`).
+
 ## 0.3.0 — 2026-11-11
 
 - Controlador: novo visual, um painel de instrumentos OPENSTEP. O

@@ -833,15 +833,27 @@ btd_dock_relayout(BtdDock *dock)
         width = dock->fill_width;
     add_slot(dock, SLOT_TRASH, width - PAD - 2 - dock->cell_w, ty, dock->cell_w, dock->cell_h, -1);
     int tab_y = dir == BTD_TAB_UP ? dock->shadow : dock->shelf_h;
-    add_slot(dock, SLOT_HIDE, 0, tab_y, dock->stub_w, dock->tab_h, -1);
+    /* Neighbouring tabs overlap by one slope, the left one in front (drawn
+     * right to left), like folder tabs: side by side, their sloped sides
+     * left a V-shaped notch between every two tabs that showed the desktop
+     * (triangles of wallpaper between General, Developer and Documents).
+     * Classic trapezoids also have rounded top corners (4 px): overlapping
+     * by the slope plus that radius closes the notch they leave at the top. */
+    int e = 0;
+    if (dock->prefs.style == BTD_STYLE_TILES)
+        e = (int)BTD_TAB_SLOPE;
+    else if (dock->prefs.style == BTD_STYLE_CLASSIC)
+        e = (int)ceil(BTD_BETA_SLANT * dock->tab_h / 28.0) + 4;
+    dock->tab_overlap = e;
+    add_slot(dock, SLOT_HIDE, 0, tab_y, dock->stub_w + e, dock->tab_h, -1);
     int tabs_w = width - 2 * dock->stub_w;
     x = dock->stub_w;
     for (guint i = 0; i < n_tabs; i++) {
         int w = (int)((guint64)tabs_w * (i + 1) / n_tabs) - (int)((guint64)tabs_w * i / n_tabs);
-        add_slot(dock, SLOT_TAB, x, tab_y, w, dock->tab_h, (int)i);
+        add_slot(dock, SLOT_TAB, x - e, tab_y, w + 2 * e, dock->tab_h, (int)i);
         x += w;
     }
-    add_slot(dock, SLOT_ADD_TAB, width - dock->stub_w, tab_y, dock->stub_w, dock->tab_h, -1);
+    add_slot(dock, SLOT_ADD_TAB, width - dock->stub_w - e, tab_y, dock->stub_w + e, dock->tab_h, -1);
     dock->tabs_end = width;
     dock->width = width;
     int full_h = dock->shadow + dock->tab_h + dock->shelf_h;
@@ -1355,8 +1367,9 @@ draw_tab_slot(BtdDock *dock, cairo_t *cr, Slot *s, gboolean active, gboolean hig
     if (l) {
         int lw, lh;
         pango_layout_get_pixel_size(l, &lw, &lh);
-        if (lw > s->rect.width - 2 * BTD_BETA_SLANT - 8) {
-            pango_layout_set_width(l, (int)(s->rect.width - 2 * BTD_BETA_SLANT - 8) * PANGO_SCALE);
+        int room = s->rect.width - 2 * dock->tab_overlap - 2 * (int)BTD_BETA_SLANT - 8;
+        if (lw > room) {
+            pango_layout_set_width(l, MAX(1, room) * PANGO_SCALE);
             pango_layout_set_ellipsize(l, PANGO_ELLIPSIZE_END);
         }
     }
@@ -1370,11 +1383,14 @@ draw_tab_slot(BtdDock *dock, cairo_t *cr, Slot *s, gboolean active, gboolean hig
     if (l)
         g_object_unref(l);
     double cy = s->rect.y + s->rect.height / 2.0 + (dir == BTD_TAB_UP ? 1 : -1);
+    /* The end slots reach tab_overlap px under their neighbour tab: the
+     * glyph stays centred on the stub itself, where nothing covers it. */
     if (s->kind == SLOT_HIDE)
-        btd_draw_arrow_glyph(cr, p, s->rect.x + s->rect.width / 2.0 - 2, cy, MIN(16, s->rect.height - 8),
+        btd_draw_arrow_glyph(cr, p, s->rect.x + dock->stub_w / 2.0 - 2, cy, MIN(16, s->rect.height - 8),
                              dock->prefs.edge == BTD_EDGE_BOTTOM);
     else if (s->kind == SLOT_ADD_TAB)
-        btd_draw_document_glyph(cr, p, s->rect.x + s->rect.width / 2.0 + 3, cy, MIN(16, s->rect.height - 9));
+        btd_draw_document_glyph(cr, p, s->rect.x + dock->tab_overlap + dock->stub_w / 2.0 + 3, cy,
+                                MIN(16, s->rect.height - 9));
 }
 
 /* X11 with a compositor: the parts of the window outside the drawing area
@@ -1535,20 +1551,33 @@ on_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
 /* ---- input ---------------------------------------------------------------- */
 
+static gboolean
+is_tab_row(SlotKind kind)
+{
+    return kind == SLOT_TAB || kind == SLOT_HIDE || kind == SLOT_ADD_TAB;
+}
+
+static gboolean
+slot_is_tab(BtdDock *dock, const Slot *s, BtdTab *tab)
+{
+    return s->kind == SLOT_TAB && btd_model_get_tab(dock->model, (guint)s->index) == tab;
+}
+
 static int
 slot_at(BtdDock *dock, double x, double y)
 {
-    /* tabs overlap: the active tab and right-most visible tab win */
+    /* Tabs overlap (tab_overlap): what is drawn in front wins, the active
+     * tab, else the left one up to the middle of its slope. */
     int found = -1;
+    BtdTab *active = btd_model_get_active_tab(dock->model);
     for (guint i = 0; i < dock->slots->len; i++) {
         Slot *s = &g_array_index(dock->slots, Slot, i);
         if (x >= s->rect.x && x < s->rect.x + s->rect.width && y >= s->rect.y && y < s->rect.y + s->rect.height) {
-            if (s->kind == SLOT_TAB && found >= 0) {
-                BtdTab *tab = btd_model_get_tab(dock->model, (guint)s->index);
+            if (found >= 0 && is_tab_row(s->kind)) {
                 Slot *prev = &g_array_index(dock->slots, Slot, found);
-                /* inside the overlapping slope, prefer the active tab, else the left one */
-                if (prev->kind == SLOT_TAB && tab != btd_model_get_active_tab(dock->model) &&
-                    x < prev->rect.x + prev->rect.width - BTD_TAB_SLOPE * 0.5)
+                if (is_tab_row(prev->kind) && !slot_is_tab(dock, s, active) &&
+                    (slot_is_tab(dock, prev, active) ||
+                     x < prev->rect.x + prev->rect.width - dock->tab_overlap * 0.5))
                     continue;
             }
             found = (int)i;

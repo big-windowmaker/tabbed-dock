@@ -56,6 +56,7 @@ typedef struct {
     int monitor_hint;             /* monitor of the window centre, -1 unknown */
     char *desktop_id;             /* resolved by the dock, cached */
     gboolean resolved;
+    struct _BtdWindowTracker *tracker;
 } BtdWindow;
 
 typedef struct _BtdWindowTracker BtdWindowTracker;
@@ -70,6 +71,9 @@ struct _BtdWindowTracker {
     BtdWindowsChangedFunc changed;
     gpointer changed_data;
     guint idle_id;
+    /* Windows taken out of the table, freed only after the changed callback:
+     * until then the dock's groups still point to them. */
+    GPtrArray *retired;
 
     void (*activate)(BtdWindowTracker *t, BtdWindow *w, guint32 time);
     void (*minimize)(BtdWindowTracker *t, BtdWindow *w);
