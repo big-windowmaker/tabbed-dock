@@ -71,6 +71,7 @@ struct _BtdDock {
     int width, height;
     int tile, tab_h, shelf_y, shelf_h, shadow;
     int cell_w, cell_h, label_h, stub_w;
+    int tab_overlap; /* px each tab of the row reaches under its neighbours */
     int fill_width;       /* width given by the compositor (Wayland, full width) */
     int tabs_end;         /* x after the last tab */
     GdkRectangle active_tab_rect;

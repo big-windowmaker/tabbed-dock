@@ -4,6 +4,14 @@ Formato livre, uma seção por versão; datas no fuso de Brasília. O pacote
 `big-wm-tabbed-dock` usa `epoch=1` desde 0.2.0 (antes, vinha no big-wm com
 versão por data).
 
+## Não lançado
+
+- Abas sem os "triângulos" de papel de parede entre elas: as abas vizinhas
+  se sobrepõem por uma inclinação (a da esquerda na frente, como abas de
+  pasta), nos estilos clássico e tiles. Lado a lado, as laterais inclinadas
+  deixavam um vão em V entre cada duas abas. O clique segue o que está
+  desenhado na frente.
+
 ## 0.3.0 — 2026-11-11
 
 - Controlador: novo visual, um painel de instrumentos OPENSTEP. O

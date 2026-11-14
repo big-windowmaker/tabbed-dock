@@ -68,7 +68,7 @@ PangoFontDescription *btd_font_new(gboolean bold, double px);
 
 /* OPENSTEP 4.0 beta look (style classic): marble textures, trapezoid tabs
  * that are wider at the base, with rounded top corners, a lit left edge and a
- * dark right edge; the gaps between them show the desktop. */
+ * dark right edge; neighbouring tabs overlap (btd-dock.c, tab_overlap). */
 #define BTD_BETA_SLANT 10.0
 cairo_pattern_t *btd_marble_pattern(double r, double g, double b, double amplitude, guint seed);
 void btd_beta_tab_path(cairo_t *cr, double x, double y, double w, double h, BtdTabDirection dir,
