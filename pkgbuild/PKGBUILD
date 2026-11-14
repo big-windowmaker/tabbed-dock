@@ -50,4 +50,5 @@ package() {
 	# ficam de fora (o README as mostra pelo GitHub).
 	install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname/docs" docs/*.md
 	install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+	install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" CHANGELOG.md CREDITS.md LICENSE
 }
