@@ -45,8 +45,9 @@ check() {
 package() {
 	meson install -C build --destdir "$pkgdir" --no-rebuild
 	cd tabbed-dock
-	for f in docs/*.md; do
-		install -Dm644 "$f" "$pkgdir/usr/share/doc/$pkgname/${f##*/}"
-	done
+	# docs/ como subpasta: os links relativos do README continuam valendo e o
+	# docs/README.md não é sobrescrito pelo README.md da raiz. As capturas
+	# ficam de fora (o README as mostra pelo GitHub).
+	install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname/docs" docs/*.md
 	install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
 }

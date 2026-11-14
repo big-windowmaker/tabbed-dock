@@ -228,6 +228,9 @@ compila, testa, empacota e roda o `namcap` a cada push. Para empacotar a cópia 
 cd pkgbuild && TABBED_DOCK_SOURCE="git+file://$PWD/.." makepkg -si
 ```
 
+O makepkg clona o repositório local: o pacote leva só o que já foi **commitado** (no ramo padrão do
+clone). Faça o commit das mudanças antes de rodar o comando.
+
 | Tipo | Pacotes |
 |---|---|
 | Depende de | glib2, gtk3, gdk-pixbuf2, cairo, pango, librsvg, libx11, libxext, wayland, gtk-layer-shell, hicolor-icon-theme |
