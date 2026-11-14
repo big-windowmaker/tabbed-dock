@@ -21,12 +21,29 @@ window_free(BtdWindow *w)
     g_free(w);
 }
 
+/*
+ * A window that goes away (destroyed, unmapped, now skip-taskbar...) leaves
+ * the table at once, but the dock hears about it only in emit_idle(), at a
+ * lower priority than GTK's redraws; its groups keep pointing to the window
+ * until then, and a frame drawn in between (the launch feedback redraws
+ * continuously) read the freed strings - a crash in g_str_hash under the
+ * draw handler when the installer window closed. The window is kept until
+ * after the changed callback.
+ */
+static void
+window_retire(BtdWindow *w)
+{
+    g_ptr_array_add(w->tracker->retired, w);
+    btd_window_tracker_queue_changed(w->tracker);
+}
+
 void
 btd_window_tracker_init_base(BtdWindowTracker *t, const char *name, guint caps)
 {
     t->name = name;
     t->caps = caps;
-    t->windows = g_hash_table_new_full(g_int64_hash, g_int64_equal, NULL, (GDestroyNotify)window_free);
+    t->windows = g_hash_table_new_full(g_int64_hash, g_int64_equal, NULL, (GDestroyNotify)window_retire);
+    t->retired = g_ptr_array_new_with_free_func((GDestroyNotify)window_free);
 }
 
 BtdWindow *
@@ -35,6 +52,7 @@ btd_window_new(BtdWindowTracker *t, guint64 id)
     BtdWindow *w = g_new0(BtdWindow, 1);
     w->id = id;
     w->serial = ++t->next_serial;
+    w->tracker = t;
     g_hash_table_insert(t->windows, &w->id, w);
     return w;
 }
@@ -57,6 +75,7 @@ emit_idle(gpointer data)
     t->idle_id = 0;
     if (t->changed)
         t->changed(t, t->changed_data);
+    g_ptr_array_set_size(t->retired, 0);
     return G_SOURCE_REMOVE;
 }
 
@@ -134,8 +153,9 @@ btd_window_tracker_free(BtdWindowTracker *t)
     t->changed = NULL;
     if (t->destroy)
         t->destroy(t);
+    g_hash_table_unref(t->windows); /* retires them all */
     if (t->idle_id)
         g_source_remove(t->idle_id);
-    g_hash_table_unref(t->windows);
+    g_ptr_array_unref(t->retired);
     g_free(t);
 }

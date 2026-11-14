@@ -16,6 +16,15 @@ foreach t : ['model', 'config', 'desktop', 'coexist', 'launch', 'wmattrs', 'geom
   test(t, exe, env: test_env, protocol: 'tap', args: ['--tap'])
 endforeach
 
+# O rastreador de janelas, sem X11 nem Wayland: uma janela que sai da tabela
+# só é liberada depois do aviso ao dock.
+if get_option('dock')
+  exe = executable('test-windows', 'test-windows.c', '../src/backend/btd-windows.c',
+                   dependencies: [core_dep, dependency('gtk+-3.0')],
+                   include_directories: include_directories('../src/backend'))
+  test('windows', exe, env: test_env, protocol: 'tap', args: ['--tap'])
+endif
+
 # O controlador (dockapp), sem X11: ordem das setas, regiões, preferências,
 # --set e os arquivos do menu do wlmaker.
 if get_option('dock') and get_option('dockapp') and have_dockapp

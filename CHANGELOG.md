@@ -11,6 +11,11 @@ versão por data).
   pasta), nos estilos clássico e tiles. Lado a lado, as laterais inclinadas
   deixavam um vão em V entre cada duas abas. O clique segue o que está
   desenhado na frente.
+- Corrigida a queda do dock (SIGSEGV em `g_str_hash` dentro do desenho)
+  quando uma janela sumia ou trocava de `WM_CLASS` enquanto o dock se
+  redesenhava, por exemplo ao abrir e fechar o instalador na ISO live: a
+  janela era liberada antes de o dock refazer seus grupos. Agora o
+  rastreador só a libera depois do aviso (`tests/test-windows.c`).
 
 ## 0.3.0 — 2026-11-11
 
