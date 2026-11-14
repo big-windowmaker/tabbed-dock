@@ -1383,11 +1383,14 @@ draw_tab_slot(BtdDock *dock, cairo_t *cr, Slot *s, gboolean active, gboolean hig
     if (l)
         g_object_unref(l);
     double cy = s->rect.y + s->rect.height / 2.0 + (dir == BTD_TAB_UP ? 1 : -1);
+    /* The end slots reach tab_overlap px under their neighbour tab: the
+     * glyph stays centred on the stub itself, where nothing covers it. */
     if (s->kind == SLOT_HIDE)
-        btd_draw_arrow_glyph(cr, p, s->rect.x + s->rect.width / 2.0 - 2, cy, MIN(16, s->rect.height - 8),
+        btd_draw_arrow_glyph(cr, p, s->rect.x + dock->stub_w / 2.0 - 2, cy, MIN(16, s->rect.height - 8),
                              dock->prefs.edge == BTD_EDGE_BOTTOM);
     else if (s->kind == SLOT_ADD_TAB)
-        btd_draw_document_glyph(cr, p, s->rect.x + s->rect.width / 2.0 + 3, cy, MIN(16, s->rect.height - 9));
+        btd_draw_document_glyph(cr, p, s->rect.x + dock->tab_overlap + dock->stub_w / 2.0 + 3, cy,
+                                MIN(16, s->rect.height - 9));
 }
 
 /* X11 with a compositor: the parts of the window outside the drawing area
