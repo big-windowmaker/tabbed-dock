@@ -12,7 +12,7 @@
 pkgname=big-wm-tabbed-dock
 epoch=1
 pkgver=0.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Big WindowMaker: dock horizontal com abas (X11 e Wayland), inspirado no OPENSTEP 4.0 beta, e seu controlador no Dock"
 arch=('x86_64')
 url="https://github.com/big-windowmaker/tabbed-dock"
@@ -20,13 +20,15 @@ license=('GPL-2.0-or-later')
 depends=('glibc' 'glib2' 'gtk3' 'gdk-pixbuf2' 'cairo' 'pango' 'librsvg'
 	'libx11' 'libxext' 'wayland' 'gtk-layer-shell' 'hicolor-icon-theme')
 makedepends=('git' 'meson' 'gettext' 'wayland-protocols')
-# test-control.sh: Xvfb, dbus-daemon e gdbus (pulado sem eles)
-checkdepends=('xorg-server-xvfb' 'dbus')
+# control/fullwidth: Xvfb, dbus-daemon e gdbus; sigterm-startup: python3
+# (cada teste é pulado sem o que precisa)
+checkdepends=('xorg-server-xvfb' 'dbus' 'python')
 optdepends=(
 	'big-wm-session: sessão Window Maker (X11), com o controlador no Dock'
 	'big-wm-wayland: sessão wlmaker (Wayland)'
 	'windowmaker: escolher entre o Dock clássico e o dock com abas (wdwrite)'
 	'wlmaker>=1:0.8.r80.g7481afe-31: menu do controlador pelo botão direito no wlmaker (Dockapps.d)'
+	'gvfs: lixeira de todos os volumes montados (sem ele, só a da pasta pessoal)'
 )
 source=("tabbed-dock::${TABBED_DOCK_SOURCE:-git+$url.git#tag=v$pkgver}")
 sha256sums=('SKIP')
