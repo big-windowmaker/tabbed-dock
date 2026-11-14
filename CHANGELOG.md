@@ -4,7 +4,7 @@ Formato livre, uma seção por versão; datas no fuso de Brasília. O pacote
 `big-wm-tabbed-dock` usa `epoch=1` desde 0.2.0 (antes, vinha no big-wm com
 versão por data).
 
-## Não lançado
+## 0.3.1 — 2026-11-14
 
 - Abas sem os "triângulos" de papel de parede entre elas: as abas vizinhas
   se sobrepõem por uma inclinação (a da esquerda na frente, como abas de
