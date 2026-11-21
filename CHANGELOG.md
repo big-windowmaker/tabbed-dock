@@ -4,6 +4,17 @@ Formato livre, uma seção por versão; datas no fuso de Brasília. O pacote
 `big-wm-tabbed-dock` usa `epoch=1` desde 0.2.0 (antes, vinha no big-wm com
 versão por data).
 
+## 0.3.2 — 2026-11-20
+
+- Aplicativo instalado com o dock já rodando: a janela aberta aparecia sem
+  ícone e o menu do botão direito não trazia “Manter em” nem “Adicionar à
+  aba” até o dock ser reiniciado (visto com o Big Remote Play). O
+  `GAppInfoMonitor` do GIO só observa as pastas de aplicativos depois de uma
+  consulta ao banco de aplicativos do GIO, e para depois de cada aviso até a
+  próxima consulta; o dock lê os `.desktop` por conta própria e nunca
+  consultava. Agora consulta ao iniciar e a cada aviso, e refaz o índice a
+  cada instalação, remoção ou atualização.
+
 ## 0.3.1 — 2026-11-14
 
 - Abas sem os "triângulos" de papel de parede entre elas: as abas vizinhas

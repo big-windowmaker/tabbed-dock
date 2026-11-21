@@ -354,10 +354,22 @@ rebuild_index(gpointer data)
     return G_SOURCE_REMOVE;
 }
 
+/* GAppInfoMonitor only watches the application directories after GIO's own
+ * database was queried, and stops after each "changed" until it is queried
+ * again; the dock scans the directories itself, so it queries just to keep
+ * the monitor armed (an app installed after the dock started got no icon,
+ * no tab actions, until the dock was restarted). */
+static void
+arm_app_monitor(void)
+{
+    g_list_free_full(g_app_info_get_all(), g_object_unref);
+}
+
 static void
 on_apps_changed(GAppInfoMonitor *monitor, gpointer data)
 {
     BtdDock *dock = data;
+    arm_app_monitor();
     /* installs touch many files: rebuild once, after things settle */
     if (dock->index_rebuild_id)
         g_source_remove(dock->index_rebuild_id);
@@ -2139,6 +2151,7 @@ dock_new(GtkApplication *app, const char *config_path, int monitor, gboolean loc
     g_strfreev(dirs);
     dock->app_monitor = g_app_info_monitor_get();
     g_signal_connect(dock->app_monitor, "changed", G_CALLBACK(on_apps_changed), dock);
+    arm_app_monitor();
 
     load_config(dock);
     btd_model_set_changed_func(dock->model, on_model_changed, dock);

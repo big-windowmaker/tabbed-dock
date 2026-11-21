@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/big-windowmaker/tabbed-dock/actions/workflows/ci.yml"><img src="https://github.com/big-windowmaker/tabbed-dock/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/vers%C3%A3o-0.3.1-informational" alt="Versão 0.3.1">
+  <img src="https://img.shields.io/badge/vers%C3%A3o-0.3.2-informational" alt="Versão 0.3.2">
   <img src="https://img.shields.io/badge/licen%C3%A7a-GPL--2.0--or--later-blue" alt="Licença GPL-2.0-or-later">
   <img src="https://img.shields.io/badge/sess%C3%B5es-X11%20%7C%20Wayland-555" alt="X11 e Wayland">
 </p>
@@ -54,7 +54,9 @@
 - **Itens**: atalhos de aplicativos (`.desktop`, inclusive Flatpak e AppImage registrados), AppImages soltos,
   documentos, pastas e separadores, com ícone e rótulo próprios por item.
 - **Aplicativos abertos**: um “pino” sob o ícone para cada janela (até três), ladrilho destacado para o
-  aplicativo ativo e, à direita, os aplicativos abertos que não estão na aba (arraste um deles para fixá-lo).
+  aplicativo ativo e, à direita, os aplicativos abertos que não estão na aba (arraste um deles para fixá-lo). Um aplicativo
+  instalado com o dock já rodando é reconhecido sem reiniciar o dock: ícone e as opções “Manter em”
+  e “Adicionar à aba” no menu.
 - **Clique**: abre; com o aplicativo aberto, ativa a janela; outro clique minimiza (configurável); com várias
   janelas, alterna entre elas. Botão do meio ou Shift+clique abrem outra instância. A rolagem sobre um
   aplicativo alterna as janelas e, sobre o resto, troca de aba.
