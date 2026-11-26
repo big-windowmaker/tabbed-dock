@@ -223,6 +223,9 @@ descritos em [docs/testes.md](docs/testes.md).
 
 ## Pacote
 
+No Big WindowMaker ele já vem instalado. Em outro Arch/Manjaro com o repositório assinado
+[`[big-wm]`](https://github.com/big-windowmaker/repo) ativo: `sudo pacman -S big-wm-tabbed-dock`.
+
 O pacote do Arch/Manjaro, `big-wm-tabbed-dock`, está em [`pkgbuild/PKGBUILD`](pkgbuild/PKGBUILD); o CI
 compila, testa, empacota e roda o `namcap` a cada push. Para empacotar a cópia local:
 
