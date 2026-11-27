@@ -148,6 +148,7 @@ is_docked(Appicons *s, BtdWindow *w, const char *desktop_id)
 }
 
 static const char *icon_name(Appicons *s, AppIcon *a);
+static cairo_surface_t *app_icon(Appicons *s, AppIcon *a, int size, int scale);
 
 /* File name of the PNG drawn for the application: big-wm-app-<key>.png. */
 static char *
@@ -164,16 +165,18 @@ icon_file_name(const char *key)
  * where the Dock and the Clip find the icons of their launchers. Once per
  * session and icon (a theme change draws it again on the next start). */
 static gboolean
-write_icon_file(Appicons *s, const char *name, const char *icon)
+write_icon_file(Appicons *s, const char *name, AppIcon *a)
 {
+    /* what was drawn: the icon name, or the windows' icon (no .desktop) */
+    const char *icon = icon_name(s, a);
+    if (!icon)
+        icon = "(windows)";
     const char *done = g_hash_table_lookup(s->icon_files, name);
     char *dir = g_build_filename(g_get_user_data_dir(), "wlmaker", "icons", NULL);
     char *path = g_build_filename(dir, name, NULL);
     gboolean ok = done && g_strcmp0(done, icon) == 0 && g_file_test(path, G_FILE_TEST_EXISTS);
     if (!ok && g_mkdir_with_parents(dir, 0755) == 0) {
-        cairo_surface_t *src = btd_icon_cache_lookup_name(s->icons, icon, LAUNCHER_ICON, 1);
-        if (!src)
-            src = btd_icon_cache_lookup_name(s->icons, "application-x-executable", LAUNCHER_ICON, 1);
+        cairo_surface_t *src = app_icon(s, a, LAUNCHER_ICON, 1);
         if (src) {
             /* As a plain ARGB image of the launcher's size. */
             cairo_surface_t *img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, LAUNCHER_ICON, LAUNCHER_ICON);
@@ -280,7 +283,7 @@ publish(Appicons *s)
             g_free(cmd);
         }
         char *name = icon_file_name(a->key);
-        if (write_icon_file(s, name, icon_name(s, a))) {
+        if (write_icon_file(s, name, a)) {
             g_string_append(out, "      Icon = ");
             plist_string(out, name);
             g_string_append(out, ";\n");
@@ -381,8 +384,16 @@ icon_name(Appicons *s, AppIcon *a)
         if (e->icon)
             return e->icon;
     }
-    BtdWindow *w = a->windows->len ? a->windows->pdata[0] : NULL;
-    return w && w->app_id ? w->app_id : "application-x-executable";
+    /* NULL: no .desktop icon; the windows' own (btd_icon_cache_lookup_windows) */
+    return NULL;
+}
+
+static cairo_surface_t *
+app_icon(Appicons *s, AppIcon *a, int size, int scale)
+{
+    const char *name = icon_name(s, a);
+    return name ? btd_icon_cache_lookup_name(s->icons, name, size, scale)
+                : btd_icon_cache_lookup_windows(s->icons, a->windows, size, scale);
 }
 
 static gboolean
@@ -403,9 +414,7 @@ on_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
         AppIcon *a = s->apps->pdata[i];
         double x = i * TILE;
         btd_draw_tile(cr, &s->palette, x, 0, TILE, FALSE, s->pressed == (int)i, s->hover == (int)i);
-        cairo_surface_t *icon = btd_icon_cache_lookup_name(s->icons, icon_name(s, a), ICON, scale);
-        if (!icon)
-            icon = btd_icon_cache_lookup_name(s->icons, "application-x-executable", ICON, scale);
+        cairo_surface_t *icon = app_icon(s, a, ICON, scale);
         if (icon) {
             cairo_save(cr);
             cairo_set_source_surface(cr, icon, x + (TILE - ICON) / 2.0, (TILE - ICON) / 2.0);

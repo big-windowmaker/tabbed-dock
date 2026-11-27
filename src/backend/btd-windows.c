@@ -18,6 +18,8 @@ window_free(BtdWindow *w)
     g_free(w->launched_desktop_file);
     g_free(w->exe);
     g_free(w->desktop_id);
+    if (w->icon)
+        cairo_surface_destroy(w->icon);
     g_free(w);
 }
 
