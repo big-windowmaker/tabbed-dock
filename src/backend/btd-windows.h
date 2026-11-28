@@ -55,6 +55,11 @@ typedef struct {
     gboolean has_geometry;
     int monitor_hint;             /* monitor of the window centre, -1 unknown */
     char *desktop_id;             /* resolved by the dock, cached */
+    /* X11: the window's own icon (_NET_WM_ICON, the size closest above
+     * 64 px), for an application with no .desktop; NULL when it has none
+     * (and always on Wayland). icon_serial is unique to each icon read. */
+    cairo_surface_t *icon;
+    guint icon_serial;
     gboolean resolved;
     struct _BtdWindowTracker *tracker;
 } BtdWindow;

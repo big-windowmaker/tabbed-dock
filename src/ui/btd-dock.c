@@ -1316,7 +1316,9 @@ draw_cell(BtdDock *dock, cairo_t *cr, Slot *s, const BtdItem *item, AppGroup *gr
         icon = btd_icon_cache_lookup_item(dock->icons, item, dock->index, icon_size, scale);
     } else {
         const BtdDesktopEntry *e = btd_desktop_index_lookup(dock->index, group->desktop_id);
-        icon = btd_icon_cache_lookup_name(dock->icons, e ? e->icon : NULL, icon_size, scale);
+        /* no .desktop (or one without Icon=): what the windows say */
+        icon = e && e->icon ? btd_icon_cache_lookup_name(dock->icons, e->icon, icon_size, scale)
+                            : btd_icon_cache_lookup_windows(dock->icons, group->windows, icon_size, scale);
     }
     double alpha = 1.0;
     if (launching && dock->prefs.animations)

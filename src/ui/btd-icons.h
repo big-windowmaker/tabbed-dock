@@ -12,6 +12,7 @@
 
 #include "btd-desktop.h"
 #include "btd-model.h"
+#include "btd-windows.h"
 
 G_BEGIN_DECLS
 
@@ -27,6 +28,11 @@ guint btd_icon_cache_size(BtdIconCache *cache);
 /* Returns a borrowed surface (valid until the next lookup may evict it;
  * draw it immediately). Never NULL: falls back to a generic icon. */
 cairo_surface_t *btd_icon_cache_lookup_name(BtdIconCache *cache, const char *icon, int size, int scale);
+/* Icon of running windows (BtdWindow *) with no .desktop icon: a theme icon
+ * named after the app ID, the WM_CLASS class or instance (also in lower
+ * case) or the program; else the window's own icon (X11 _NET_WM_ICON);
+ * else the generic icon. Never NULL; borrowed like the lookups above. */
+cairo_surface_t *btd_icon_cache_lookup_windows(BtdIconCache *cache, GPtrArray *windows, int size, int scale);
 cairo_surface_t *btd_icon_cache_lookup_item(BtdIconCache *cache, const BtdItem *item, BtdDesktopIndex *index,
                                             int size, int scale);
 

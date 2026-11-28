@@ -4,6 +4,16 @@ Formato livre, uma seção por versão; datas no fuso de Brasília. O pacote
 `big-wm-tabbed-dock` usa `epoch=1` desde 0.2.0 (antes, vinha no big-wm com
 versão por data).
 
+## 0.3.3 — 2026-11-27
+
+- Aplicativo aberto sem `.desktop` (zenity, um script, um jogo, um
+  programa do Wine) aparecia com o ícone genérico "exec", enquanto o
+  appicon do Window Maker ao lado mostrava o dele. Agora vem primeiro um
+  ícone do tema com o nome da janela (app ID, classe ou instância do
+  `WM_CLASS`, também em minúsculas, ou o programa) e, no X11, o ícone da
+  própria janela (`_NET_WM_ICON`). No Wayland vale o do tema (o protocolo
+  não traz os pixels). Teste `tests/test-icons.c`.
+
 ## 0.3.2 — 2026-11-20
 
 - Aplicativo instalado com o dock já rodando: a janela aberta aparecia sem

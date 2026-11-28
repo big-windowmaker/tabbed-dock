@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/big-windowmaker/tabbed-dock/actions/workflows/ci.yml"><img src="https://github.com/big-windowmaker/tabbed-dock/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/vers%C3%A3o-0.3.2-informational" alt="Versão 0.3.2">
+  <img src="https://img.shields.io/badge/vers%C3%A3o-0.3.3-informational" alt="Versão 0.3.3">
   <img src="https://img.shields.io/badge/licen%C3%A7a-GPL--2.0--or--later-blue" alt="Licença GPL-2.0-or-later">
   <img src="https://img.shields.io/badge/sess%C3%B5es-X11%20%7C%20Wayland-555" alt="X11 e Wayland">
 </p>

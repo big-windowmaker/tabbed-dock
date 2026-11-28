@@ -23,6 +23,12 @@ if get_option('dock')
                    dependencies: [core_dep, dependency('gtk+-3.0')],
                    include_directories: include_directories('../src/backend'))
   test('windows', exe, env: test_env, protocol: 'tap', args: ['--tap'])
+  # Ícone de um aplicativo sem .desktop: tema pelo nome da janela, o ícone
+  # da própria janela (_NET_WM_ICON) ou o genérico.
+  exe = executable('test-icons', 'test-icons.c', '../src/ui/btd-icons.c', '../src/backend/btd-windows.c',
+                   dependencies: [core_dep, dependency('gtk+-3.0'), dependency('librsvg-2.0')],
+                   include_directories: include_directories('../src/ui', '../src/backend'))
+  test('icons', exe, env: test_env, protocol: 'tap', args: ['--tap'])
 endif
 
 # O controlador (dockapp), sem X11: ordem das setas, regiões, preferências,

@@ -235,6 +235,60 @@ btd_icon_cache_lookup_name(BtdIconCache *c, const char *icon, int size, int scal
     return lookup_or_load(c, icon && *icon ? icon : "application-x-executable", size, scale, NULL);
 }
 
+/* The window's own pixels, scaled once to the icon size (cached per window
+ * and icon version). */
+static cairo_surface_t *
+window_pixels(BtdIconCache *c, const BtdWindow *w, int size, int scale)
+{
+    char *key = g_strdup_printf("window:%" G_GUINT64_FORMAT ":%u|%d|%d", w->id, w->icon_serial, size, scale);
+    cairo_surface_t *s = cache_get(c, key);
+    if (!s) {
+        int px = size * scale;
+        double iw = cairo_image_surface_get_width(w->icon), ih = cairo_image_surface_get_height(w->icon);
+        s = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, px, px);
+        cairo_t *cr = cairo_create(s);
+        double k = MIN(px / iw, px / ih);
+        cairo_translate(cr, (px - iw * k) / 2, (px - ih * k) / 2);
+        cairo_scale(cr, k, k);
+        cairo_set_source_surface(cr, w->icon, 0, 0);
+        cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_GOOD);
+        cairo_paint(cr);
+        cairo_destroy(cr);
+        cairo_surface_set_device_scale(s, scale, scale);
+        cache_put(c, key, s);
+    }
+    g_free(key);
+    return s;
+}
+
+cairo_surface_t *
+btd_icon_cache_lookup_windows(BtdIconCache *c, GPtrArray *windows, int size, int scale)
+{
+    for (guint i = 0; windows && i < windows->len; i++) {
+        const BtdWindow *w = windows->pdata[i];
+        const char *names[] = { w->app_id, w->wm_class, w->wm_instance, w->exe };
+        for (guint k = 0; k < G_N_ELEMENTS(names); k++) {
+            if (!names[k] || !*names[k] || strchr(names[k], '/'))
+                continue;
+            char *lower = g_utf8_strdown(names[k], -1);
+            const char *found = gtk_icon_theme_has_icon(c->theme, names[k]) ? names[k]
+                                : gtk_icon_theme_has_icon(c->theme, lower) ? lower
+                                                                            : NULL;
+            cairo_surface_t *s = found ? lookup_or_load(c, found, size, scale, NULL) : NULL;
+            g_free(lower);
+            if (s)
+                return s;
+        }
+    }
+    for (guint i = 0; windows && i < windows->len; i++) {
+        const BtdWindow *w = windows->pdata[i];
+        if (w->icon && cairo_surface_status(w->icon) == CAIRO_STATUS_SUCCESS &&
+            cairo_image_surface_get_width(w->icon) > 0)
+            return window_pixels(c, w, size, scale);
+    }
+    return btd_icon_cache_lookup_name(c, NULL, size, scale);
+}
+
 cairo_surface_t *
 btd_icon_cache_lookup_item(BtdIconCache *c, const BtdItem *item, BtdDesktopIndex *index, int size, int scale)
 {

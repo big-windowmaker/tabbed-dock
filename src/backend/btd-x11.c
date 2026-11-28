@@ -34,6 +34,7 @@ enum {
     A_NET_WM_STATE_FULLSCREEN,
     A_NET_WM_STATE_MAXIMIZED_VERT,
     A_NET_WM_STATE_MAXIMIZED_HORZ,
+    A_NET_WM_ICON,
     A_COUNT
 };
 
@@ -43,6 +44,7 @@ static const char *atom_names[A_COUNT] = {
     "_NET_WM_WINDOW_TYPE_DIALOG", "_NET_WM_NAME", "UTF8_STRING", "WM_STATE", "_NET_WM_PID",
     "_GTK_APPLICATION_ID", "_NET_CLOSE_WINDOW", "WM_CHANGE_STATE",
     "_NET_WM_STATE_FULLSCREEN", "_NET_WM_STATE_MAXIMIZED_VERT", "_NET_WM_STATE_MAXIMIZED_HORZ",
+    "_NET_WM_ICON",
 };
 
 typedef struct {
@@ -239,6 +241,84 @@ update_geometry(X11Tracker *x, BtdWindow *bw)
     return TRUE;
 }
 
+/* The window's own icon (_NET_WM_ICON: width, height and ARGB pixels, one
+ * per CARDINAL, for each size it offers). Window Maker draws the appicon of
+ * an application with no .desktop from it; the dock does the same instead of
+ * the generic icon. Takes the smallest size of at least 64 px, else the
+ * largest. TRUE when it changed. */
+#define MAX_ICON_SIDE 512
+static gboolean
+update_icon(X11Tracker *x, BtdWindow *bw)
+{
+    Atom type;
+    int format;
+    unsigned long n = 0, after;
+    unsigned char *raw = NULL;
+    cairo_surface_t *icon = NULL;
+    gdk_x11_display_error_trap_push(x->gdk_display);
+    int status = XGetWindowProperty(x->dpy, (Window)bw->id, x->atoms[A_NET_WM_ICON], 0,
+                                    2 + MAX_ICON_SIDE * MAX_ICON_SIDE * 4, False, XA_CARDINAL, &type, &format, &n,
+                                    &after, &raw);
+    if (!gdk_x11_display_error_trap_pop(x->gdk_display) && status == Success && raw && type == XA_CARDINAL &&
+        format == 32) {
+        /* format 32 arrives as an array of long (64-bit on x86_64) */
+        const unsigned long *d = (const unsigned long *)raw;
+        unsigned long best = n, best_w = 0, best_h = 0;
+        for (unsigned long i = 0; i + 2 <= n;) {
+            unsigned long w = d[i], h = d[i + 1];
+            /* an incomplete record ends the list (w, h <= n: no overflow) */
+            if (w == 0 || h == 0 || w > n || h > n || w * h > n - i - 2)
+                break;
+            if (w > MAX_ICON_SIDE || h > MAX_ICON_SIDE) {
+                i += 2 + w * h; /* complete but too big: the next size */
+                continue;
+            }
+            gboolean better = best == n || (best_w < 64 ? w > best_w : (w >= 64 && w < best_w));
+            if (better) {
+                best = i;
+                best_w = w;
+                best_h = h;
+            }
+            i += 2 + w * h;
+        }
+        if (best < n)
+            icon = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)best_w, (int)best_h);
+        if (icon && cairo_surface_status(icon) != CAIRO_STATUS_SUCCESS) {
+            /* no memory: keep the icon the window had */
+            cairo_surface_destroy(icon);
+            XFree(raw);
+            return FALSE;
+        }
+        if (icon) {
+            unsigned char *dst = cairo_image_surface_get_data(icon);
+            int stride = cairo_image_surface_get_stride(icon);
+            cairo_surface_flush(icon);
+            for (unsigned long yy = 0; yy < best_h; yy++) {
+                guint32 *row = (guint32 *)(dst + yy * (unsigned long)stride);
+                for (unsigned long xx = 0; xx < best_w; xx++) {
+                    guint32 v = (guint32)d[best + 2 + yy * best_w + xx];
+                    guint32 a = v >> 24, r = (v >> 16) & 0xff, g = (v >> 8) & 0xff, b = v & 0xff;
+                    /* cairo wants premultiplied alpha */
+                    row[xx] = a << 24 | (r * a / 255) << 16 | (g * a / 255) << 8 | (b * a / 255);
+                }
+            }
+            cairo_surface_mark_dirty(icon);
+        }
+    }
+    if (raw)
+        XFree(raw);
+    if (!icon && !bw->icon)
+        return FALSE;
+    if (bw->icon)
+        cairo_surface_destroy(bw->icon);
+    bw->icon = icon;
+    /* unique across windows: X reuses window ids, and the icon cache is
+     * keyed by id and serial */
+    static guint icon_serial;
+    bw->icon_serial = ++icon_serial;
+    return TRUE;
+}
+
 static BtdWindow *
 add_window(X11Tracker *x, Window w)
 {
@@ -269,6 +349,7 @@ add_window(X11Tracker *x, Window w)
     update_title(x, bw);
     update_state(x, bw);
     update_geometry(x, bw);
+    update_icon(x, bw);
     bw->active = (Window)bw->id == x->active;
     return bw;
 }
@@ -422,6 +503,8 @@ event_filter(GdkXEvent *gxev, GdkEvent *event, gpointer data)
         }
     } else if (a == x->atoms[A_NET_WM_NAME] || a == XA_WM_NAME) {
         changed = update_title(x, bw);
+    } else if (a == x->atoms[A_NET_WM_ICON]) {
+        changed = update_icon(x, bw);
     } else if (a == XA_WM_CLASS || a == x->atoms[A_GTK_APPLICATION_ID]) {
         /* re-read identity; the dock re-resolves the application */
         g_hash_table_remove(x->base.windows, &id);
