@@ -266,8 +266,13 @@ update_icon(X11Tracker *x, BtdWindow *bw)
         unsigned long best = n, best_w = 0, best_h = 0;
         for (unsigned long i = 0; i + 2 <= n;) {
             unsigned long w = d[i], h = d[i + 1];
-            if (w == 0 || h == 0 || w > MAX_ICON_SIDE || h > MAX_ICON_SIDE || w * h > n - i - 2)
+            /* an incomplete record ends the list (w, h <= n: no overflow) */
+            if (w == 0 || h == 0 || w > n || h > n || w * h > n - i - 2)
                 break;
+            if (w > MAX_ICON_SIDE || h > MAX_ICON_SIDE) {
+                i += 2 + w * h; /* complete but too big: the next size */
+                continue;
+            }
             gboolean better = best == n || (best_w < 64 ? w > best_w : (w >= 64 && w < best_w));
             if (better) {
                 best = i;
@@ -276,8 +281,15 @@ update_icon(X11Tracker *x, BtdWindow *bw)
             }
             i += 2 + w * h;
         }
-        if (best < n) {
+        if (best < n)
             icon = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)best_w, (int)best_h);
+        if (icon && cairo_surface_status(icon) != CAIRO_STATUS_SUCCESS) {
+            /* no memory: keep the icon the window had */
+            cairo_surface_destroy(icon);
+            XFree(raw);
+            return FALSE;
+        }
+        if (icon) {
             unsigned char *dst = cairo_image_surface_get_data(icon);
             int stride = cairo_image_surface_get_stride(icon);
             cairo_surface_flush(icon);

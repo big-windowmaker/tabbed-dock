@@ -167,10 +167,15 @@ icon_file_name(const char *key)
 static gboolean
 write_icon_file(Appicons *s, const char *name, AppIcon *a)
 {
-    /* what was drawn: the icon name, or the windows' icon (no .desktop) */
-    const char *icon = icon_name(s, a);
-    if (!icon)
-        icon = "(windows)";
+    /* what was drawn: the icon name, or the windows' icon (no .desktop),
+     * which changes with the version of a window's own icon */
+    char *icon = g_strdup(icon_name(s, a));
+    if (!icon) {
+        guint serial = 0;
+        for (guint i = 0; i < a->windows->len && !serial; i++)
+            serial = ((BtdWindow *)a->windows->pdata[i])->icon_serial;
+        icon = g_strdup_printf("(windows:%u)", serial);
+    }
     const char *done = g_hash_table_lookup(s->icon_files, name);
     char *dir = g_build_filename(g_get_user_data_dir(), "wlmaker", "icons", NULL);
     char *path = g_build_filename(dir, name, NULL);
@@ -200,6 +205,7 @@ write_icon_file(Appicons *s, const char *name, AppIcon *a)
         if (ok)
             g_hash_table_insert(s->icon_files, g_strdup(name), g_strdup(icon));
     }
+    g_free(icon);
     g_free(path);
     g_free(dir);
     return ok;
